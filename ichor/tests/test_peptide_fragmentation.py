@@ -8,7 +8,7 @@ fr = Fragmentor()
 fragments = fr.fragment_peptide(pep_sequence)
 
 for fragment in fragments:
-    print fragment
+    print(fragment)
 
 
-print rpy2.__version__
+print(rpy2.__version__)

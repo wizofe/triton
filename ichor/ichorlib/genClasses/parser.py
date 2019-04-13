@@ -22,7 +22,7 @@ import itertools
 from matplotlib.font_manager import FontProperties
 import imageio
 from scipy import signal
-import cPickle as pickle
+import pickle as pickle
 from decimal import Decimal
 import math
 from mpl_toolkits.mplot3d import Axes3D
@@ -456,7 +456,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
             end_v = s_v + num_colours*inc
 
             volt_list = []
-            volt_list.append(range(s_v, end_v, inc))
+            volt_list.append(list(range(s_v, end_v, inc)))
             title_list = []
 
             if self.increment_unit.toPlainText() == '':
@@ -500,7 +500,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         time = []
                         intensity = []
                         sd = []
-                        data_list = zip(*(line.strip().split('\t') for line in file))
+                        data_list = list(zip(*(line.strip().split('\t') for line in file)))
                         for item in tuple(data_list[0]):
                             time.append(float(item))
                         for item in tuple(data_list[1]):
@@ -513,7 +513,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         time = []
                         intensity = []
                         sd = 0
-                        data_list = zip(*(line.strip().split('\t') for line in file))
+                        data_list = list(zip(*(line.strip().split('\t') for line in file)))
                         for item in tuple(data_list[0]):
                             time.append(float(item))
                         for item in tuple(data_list[1]):
@@ -682,7 +682,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                 self.log.appendPlainText('Creating combined graph') 
                 QApplication.processEvents()
 
-                z_set = range(s_v, end_v, inc)
+                z_set = list(range(s_v, end_v, inc))
                 
 
                 fig = plt.figure()
@@ -1000,7 +1000,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
             end_v_2 = s_v_2 + num_colours_1*inc_2
 
             volt_list_2 = []
-            volt_list_2.append(range(s_v_2, end_v_2, inc_2))
+            volt_list_2.append(list(range(s_v_2, end_v_2, inc_2)))
             title_list_2 = []
 
             if self.increment_unit_2.toPlainText() == '':
@@ -1028,7 +1028,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                 reader = csv.reader(file_1)
                 time_1 = []
                 intensity_1 = []
-                data_list_1 = zip(*(line.strip().split('\t') for line in file_1))
+                data_list_1 = list(zip(*(line.strip().split('\t') for line in file_1)))
                 for item in tuple(data_list_1[0]):
                     time_1.append(float(item))
                 for item in tuple(data_list_1[1]):
@@ -1092,7 +1092,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                 reader = csv.reader(file_2)
                 time_2 = []
                 intensity_2 = []
-                data_list_2 = zip(*(line.strip().split('\t') for line in file_2))
+                data_list_2 = list(zip(*(line.strip().split('\t') for line in file_2)))
                 for item in tuple(data_list_2[0]):
                     time_2.append(float(item))
                 for item in tuple(data_list_2[1]):
@@ -1470,7 +1470,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         reader = csv.reader(file_1)
                         time_1 = []
                         intensity_1 = []
-                        data_list_1 = zip(*(line.strip().split('\t') for line in file_1))
+                        data_list_1 = list(zip(*(line.strip().split('\t') for line in file_1)))
                         for item in tuple(data_list_1[0]):
                             time_1.append(float(item))
                         for item in tuple(data_list_1[1]):
@@ -1489,7 +1489,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         reader = csv.reader(file_2)
                         time_2 = []
                         intensity_2 = []
-                        data_list_2 = zip(*(line.strip().split('\t') for line in file_2))
+                        data_list_2 = list(zip(*(line.strip().split('\t') for line in file_2)))
                         for item in tuple(data_list_2[0]):
                             time_2.append(float(item))
                         for item in tuple(data_list_2[1]):
@@ -1530,7 +1530,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                     for no in range(0, len(time_1)):
                         av_x = [time_1[no], time_2[no]]
                         av_time.append(np.nanmean(av_x)) 
-                        print(np.nanstd(av_x))
+                        print((np.nanstd(av_x)))
 
                     sns.despine()
                     plt.plot(time_1, pc_intensity_1, 'b')
@@ -1580,7 +1580,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         reader = csv.reader(file_1)
                         time_1 = []
                         intensity_1 = []
-                        data_list_1 = zip(*(line.strip().split('\t') for line in file_1))
+                        data_list_1 = list(zip(*(line.strip().split('\t') for line in file_1)))
                         for item in tuple(data_list_1[0]):
                             time_1.append(float(item))
                         for item in tuple(data_list_1[1]):
@@ -1599,7 +1599,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         reader = csv.reader(file_2)
                         time_2 = []
                         intensity_2 = []
-                        data_list_2 = zip(*(line.strip().split('\t') for line in file_2))
+                        data_list_2 = list(zip(*(line.strip().split('\t') for line in file_2)))
                         for item in tuple(data_list_2[0]):
                             time_2.append(float(item))
                         for item in tuple(data_list_2[1]):
@@ -1618,7 +1618,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                         reader = csv.reader(file_3)
                         time_3 = []
                         intensity_3 = []
-                        data_list_3 = zip(*(line.strip().split('\t') for line in file_3))
+                        data_list_3 = list(zip(*(line.strip().split('\t') for line in file_3)))
                         for item in tuple(data_list_3[0]):
                             time_3.append(float(item))
                         for item in tuple(data_list_3[1]):
@@ -1663,7 +1663,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
                     for no in range(0, len(time_1)):
                         av_x = [time_1[no], time_2[no], time_3[no]]
                         av_time.append(np.nanmean(av_x)) 
-                        print(np.nanstd(av_x))
+                        print((np.nanstd(av_x)))
 
                     sns.despine()
                     plt.plot(time_1, pc_intensity_1, 'b')

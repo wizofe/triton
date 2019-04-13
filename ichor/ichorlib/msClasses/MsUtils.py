@@ -181,7 +181,7 @@ def sg(y, window_size, order, deriv=0):
         raise TypeError("window_size size must be a positive odd number")
     if window_size < order + 2:
         raise TypeError("window_size is too small for the polynomials order")
-    order_range = range(order + 1)
+    order_range = list(range(order + 1))
     half_window = (window_size - 1) // 2
     # precompute coefficients
     b = np.mat([[k ** i for i in order_range] for k in range(-half_window, half_window + 1)])

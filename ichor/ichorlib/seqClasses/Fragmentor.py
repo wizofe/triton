@@ -16,7 +16,7 @@ class Fragmentor(object):
 
         """
 
-        print 'I am the Fragmentor hahahaha!'
+        print('I am the Fragmentor hahahaha!')
 
 
     def fragment_peptide(self, peptide_sequence):

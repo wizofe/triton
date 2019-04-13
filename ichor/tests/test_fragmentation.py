@@ -50,7 +50,7 @@ allchar = ['A', 'G', 'C', 'T', 'U']
 random_oligo_to_test = 500
 
 file_for_p_vals = open('p_values_500.txt', 'w')
-print 'Oligo: {0:<30} Score: {1:7.3f}'.format(oligo, score)
+print('Oligo: {0:<30} Score: {1:7.3f}'.format(oligo, score))
 file_for_p_vals.write("{0}\t{1}\n".format(oligo, score))
 
 
@@ -61,7 +61,7 @@ for i in range(random_oligo_to_test):
     df_matches = matcher.match_oligo_fragments(fragments, ms, ppm_error, charges, modifications)
     score = sc.simple_score(df_matches)
 
-    print 'Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score)
+    print('Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score))
     file_for_p_vals.write("{0}\t{1}\n".format(random_oligo, score))
 
 

@@ -55,7 +55,7 @@ class Matcher(object):
         total_modification_mass = 0
         modification_string = ''
 
-        for key, value in modifications.iteritems():
+        for key, value in modifications.items():
 
             if isinstance(value, int):
 

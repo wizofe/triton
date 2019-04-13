@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle as pickle
 import numpy as np
 
 from ichorlib.genClasses.FileManipulations import FileManipulations
@@ -76,7 +76,7 @@ for dir_path in dir_paths_13:
     exp_description = '' + file_ending[-3] + '_' + file_ending[-2] + '_' +file_ending[-1] + ''
     output_file = out_base_dir + exp_description + '_combined.txt'
 
-    print output_file
+    print(output_file)
 
     data = fm.dir_to_challenger_input(output_file, dir_path,
                                       exp_name = exp_description, smooth_data = True,

@@ -43,7 +43,7 @@ df_search_space = matcher.create_search_space(fragments, charges, modifications)
 
 df_results = matcher.match_oligo_fragments_pandas(df_search_space, ms, ppm_error)
 
-print df_results
+print(df_results)
 
 score = sc.simple_score(df_results)
 
@@ -53,7 +53,7 @@ allchar = ['A', 'G', 'C', 'T', 'U']
 random_oligo_to_test = 1000
 
 file_for_p_vals = open('p_values_1.txt', 'w')
-print 'Oligo: {0:<30} Score: {1:7.3f}'.format(oligo, score)
+print('Oligo: {0:<30} Score: {1:7.3f}'.format(oligo, score))
 file_for_p_vals.write("{0}\t{1}\n".format(oligo, score))
 
 
@@ -68,7 +68,7 @@ for i in range(random_oligo_to_test):
 
     score = sc.simple_score(df_results)
 
-    print 'Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score)
+    print('Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score))
     file_for_p_vals.write("{0}\t{1}\n".format(random_oligo, score))
 
 
