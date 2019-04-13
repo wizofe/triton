@@ -33,7 +33,7 @@ class Modification(object):
         }
 
     def read_mods_from_JSON(self, JSON_file = './params/modifications.json'):
-        print "Loading mods from " + JSON_file
+        print("Loading mods from " + JSON_file)
 
         temp_mod = Modification(name='Phospho_test', formula='PO3', residue_affected = 'S', fixed_modification = 0)
 

@@ -1,6 +1,6 @@
 """Detect peaks in data based on their amplitude and other features."""
 
-from __future__ import division, print_function
+
 import numpy as np
 
 __author__ = "Marcos Duarte, https://github.com/demotu/BMC"

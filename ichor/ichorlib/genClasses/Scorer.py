@@ -76,7 +76,7 @@ class Scorer(object):
 
             score = self.simple_score(df_results)
 
-            print 'Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score)
+            print('Oligo: {0:<30} Score: {1:7.3f}'.format(random_oligo, score))
 
             data_to_save.append([random_oligo, score])
 
@@ -86,11 +86,11 @@ class Scorer(object):
         c = extreme_fit[0]
         loc = extreme_fit[1]
         scale = extreme_fit[2]
-        print ("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(c, loc, scale)
+        print(("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(c, loc, scale))
 
         extreme_to_plot = genextreme(c, loc, scale)
         p_value = extreme_to_plot.pdf(score_to_test)
-        print ("p value of score {0} = {1}").format(score_to_test, p_value)
+        print(("p value of score {0} = {1}").format(score_to_test, p_value))
 
         return dist_df, p_value, score_to_test, extreme_to_plot
 

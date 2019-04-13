@@ -28,7 +28,7 @@ class IMSpectrum(MassSpectrum):
             # print np.shape(self.matrix)
             return True
         except:
-            print 'Opening amphitrite file failed: %s' % filename
+            print('Opening amphitrite file failed: %s' % filename)
             return False
 
     def extract_atd_from_mz_range(self, mzmin, mzmax):
@@ -50,7 +50,7 @@ class IMSpectrum(MassSpectrum):
         indexmax = np.argmin(abs(self.xvals - mzmax))
         matrixslice = self.matrix[:, indexmin:indexmax]
         extractedATDIntensity = np.sum(matrixslice, axis=1)
-        print ('Extracting ATD for m/z range {0} - {1}'.format(mzmin, mzmax))
+        print(('Extracting ATD for m/z range {0} - {1}'.format(mzmin, mzmax)))
 
         return extractedATDIntensity
 
@@ -69,7 +69,7 @@ class IMSpectrum(MassSpectrum):
         indexmax = np.argmin(abs(self.atdaxis - atdmax))
         matrixslice = self.matrix[indexmin:indexmax, :]
         extractedMZIntensity = np.sum(matrixslice, axis=0)
-        print ('Reconstructing m/z for ATD range {0} - {1}'.format(atdmin, atdmax))
+        print(('Reconstructing m/z for ATD range {0} - {1}'.format(atdmin, atdmax)))
 
         return extractedMZIntensity
 

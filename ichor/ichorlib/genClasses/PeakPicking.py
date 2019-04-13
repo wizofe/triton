@@ -1,7 +1,7 @@
 import numpy as np
 from collections import OrderedDict
 from ichorlib.msClasses.MsPeak import MsPeak
-import detect_peaks 
+from . import detect_peaks 
 
 
 class PeakPicking ():
@@ -42,7 +42,7 @@ class PeakPicking ():
                     gr = (float(yvals[i + 1]) - float(yvals[i])) / (float(xvals[i + 1]) - float(x))
 
                 except:
-                    print 'Gradient calculation: divide by 0 replaced by 0.000001'
+                    print('Gradient calculation: divide by 0 replaced by 0.000001')
                     gr = 0.000001
 
                 self.gradient.append(gr)
@@ -101,7 +101,7 @@ class PeakPicking ():
         gPeaks = OrderedDict()
         count = 0
         for i, v in enumerate(self.gradient):
-            print i, v
+            print(i, v)
             if i + 1 < len(self.gradient):
                 if v > 0:
                     if self.gradient[i + 1] <= 0:
@@ -111,7 +111,7 @@ class PeakPicking ():
                         count += 1
         if limit:
             gPeaks_out = OrderedDict()
-            lim = max([gPeaks[x][1] for x in gPeaks.keys()]) * float(limit) / 100
+            lim = max([gPeaks[x][1] for x in list(gPeaks.keys())]) * float(limit) / 100
             count = 0
             for i, (k, v) in enumerate(gPeaks.items()):
                 if v[1] > lim:

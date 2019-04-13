@@ -24,7 +24,7 @@ p_values = norm.sf(abs(z_score)) #one-sided
 p_values_2side = norm.sf(abs(z_score))*2 #twosided
 p_values3 = 1 - scipy.special.ndtr(z_score)
 
-print ("Mu:{0:5.2f} Sigma:{1:5.2f} z_score:{2:5.2f} p_value_one_side: {3:15.13f} p_value_two_side: {4:15.13f} p_values {5:15.13f}").format(mu, sigma, z_score, p_values, p_values_2side, p_values3)
+print(("Mu:{0:5.2f} Sigma:{1:5.2f} z_score:{2:5.2f} p_value_one_side: {3:15.13f} p_value_two_side: {4:15.13f} p_values {5:15.13f}").format(mu, sigma, z_score, p_values, p_values_2side, p_values3))
 
 
 # instead use extreme value distribution
@@ -36,7 +36,7 @@ c = extreme_fit[0]
 loc = extreme_fit[1]
 scale = extreme_fit[2]
 
-print ("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(c, loc, scale)
+print(("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(c, loc, scale))
 
 
 ax1 = sns.distplot(df[1], fit=genextreme, kde=False)
@@ -49,6 +49,6 @@ p_value = extreme_to_plot.pdf(score_to_test)
 
 ax1.axvline(score_to_test)
 
-print ("p value of score {0} = {1}").format(score_to_test, p_value)
+print(("p value of score {0} = {1}").format(score_to_test, p_value))
 
 plt.show()

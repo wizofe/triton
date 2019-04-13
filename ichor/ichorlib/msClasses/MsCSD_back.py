@@ -56,7 +56,7 @@ class MsCSD():
 
         charges = collections.OrderedDict()
         masses = []
-        zs = xrange(1, 101)
+        zs = range(1, 101)
         for z in zs:
             charges[z] = []
             for i in range(len(self.mspeaks)):
@@ -94,7 +94,7 @@ class MsCSD():
             for peak in self.mspeaks:
                 calcmass = msutils.calc_mass(peak.x, peak.charge)
                 diff = self.mass - calcmass
-                print "z {1: <3} m/z {0: 9.3f} mass {2:8.2f} massDiff {3:8.2f} ".format(peak.x, peak.charge, calcmass, diff)
+                print("z {1: <3} m/z {0: 9.3f} mass {2:8.2f} massDiff {3:8.2f} ".format(peak.x, peak.charge, calcmass, diff))
 
     def plot_gaussian(self, ax, xaxis, **kwargs):
         gaussian = self.amp*np.exp((-(xaxis-self.mu)**2)/(2*(self.fwhh/2.3548200450309493)**2))
@@ -124,9 +124,9 @@ class MsCSD():
                 simulatedCSD += peak.simulate_peak(xaxis, fwhm, peakShape)
                 ln = ax.text(peak.x, peak.y, peak.charge) #tidy this up to get charge state centered
                 #ln = ax.plot(xaxis, simulatedCSD, **kwargs)
-                print simulatedCSD
+                print(simulatedCSD)
 
-        print simulatedCSD
+        print(simulatedCSD)
         ln = ax.plot(xaxis, simulatedCSD, **kwargs)
         return ln
 
@@ -134,12 +134,12 @@ class MsCSD():
     def calcMassAndChargeOld(self):
 
         for pe in self.mspeaks:
-            print pe.x
+            print(pe.x)
 
         self.mspeaks.sort(key=operator.itemgetter(0), reverse=False)
 
         for pe2 in self.mspeaks:
-            print pe2.x
+            print(pe2.x)
 
         mzarray = []
         for peak in self.mspeaks:
@@ -149,7 +149,7 @@ class MsCSD():
 
         charges = collections.OrderedDict()
         masses = []
-        zs = xrange(1, 101)
+        zs = range(1, 101)
         for z in zs:
             charges[z] = []
             for i, mz in enumerate(mzarray):
@@ -167,7 +167,7 @@ class MsCSD():
         avgmass = masses[0][2]
         for tmass in masses[0][3]:
             diff = avgmass - tmass
-            print "z: {0} m/z: {1} mass: {2} massDiff {3}".format(tz, tmass, avgmass, diff)
+            print("z: {0} m/z: {1} mass: {2} massDiff {3}".format(tz, tmass, avgmass, diff))
             tz += 1
 
         return avgmass, masses[0]

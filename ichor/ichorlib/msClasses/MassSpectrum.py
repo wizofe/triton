@@ -46,7 +46,7 @@ class MassSpectrum():
             count += 1
             if count == grain:
                 temp = x.rstrip('\r\n')
-                vals = map(float, temp.split('\t'))
+                vals = list(map(float, temp.split('\t')))
                 if not x_range:
                     self.xvals.append(vals[0])
                     self.yvals.append(vals[1])
@@ -95,7 +95,7 @@ class MassSpectrum():
         Actual window length used is 2*window_len+1 to avoid breakage'''
         window_len = 2*window_len + 1
         self.restore_raw_yvals()
-        for i in xrange(smoothes):
+        for i in range(smoothes):
             self.yvals = msutils.sg(self.yvals,window_size=window_len,order=poly_order)
         #self.normalisation_bpi()
 
@@ -124,7 +124,7 @@ class MassSpectrum():
         min_index = self.find_nearest(self.xvals, min)
         max_index = self.find_nearest(self.xvals, max)
 
-        print ('Min {0} Max {1} Total length off original array {2}').format(min_index, max_index, len(self.originalxvals))
+        print(('Min {0} Max {1} Total length off original array {2}').format(min_index, max_index, len(self.originalxvals)))
 
         self.xvals = self.xvals[min_index : max_index]
         self.yvals = self.yvals[min_index : max_index]
@@ -167,18 +167,18 @@ class MassSpectrum():
 
         startTime = time.time()
         p1, success = optimize.leastsq(errorfunc, p0, args=(fixed_p_fwhh))
-        print "Optimisation took:", time.time()-startTime, "s"
+        print(("Optimisation took:", time.time()-startTime, "s"))
         #print p1
 
         #update csds with optimised params
-        params_per_csd = [p1[pos:pos + 5] for pos in xrange(0, len(p1), 5)]
+        params_per_csd = [p1[pos:pos + 5] for pos in range(0, len(p1), 5)]
         #print params_per_csd
 
 
-        print "Updating CSD after optimisation"
+        print ("Updating CSD after optimisation")
         for i in range(len(self.csds)):
 
-            print ('{0} {1} {2} {3}').format(params_per_csd[i][0], params_per_csd[i][1], params_per_csd[i][2], params_per_csd[i][3])
+            print(('{0} {1} {2} {3}').format(params_per_csd[i][0], params_per_csd[i][1], params_per_csd[i][2], params_per_csd[i][3]))
             self.csds[i].csd_mass = params_per_csd[i][0]
             self.csds[i].g_amp = params_per_csd[i][1]
             self.csds[i].g_mu = params_per_csd[i][2]
@@ -202,7 +202,7 @@ class MassSpectrum():
          zs - charges to be simulated
          oneFwhm """
 
-        params_per_csd = [p0[pos:pos + 5] for pos in xrange(0, len(p0), 5)]
+        params_per_csd = [p0[pos:pos + 5] for pos in range(0, len(p0), 5)]
         #print params_per_csd
 
         for i in range(len(self.csds)):
