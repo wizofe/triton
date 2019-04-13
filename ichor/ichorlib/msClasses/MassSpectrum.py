@@ -167,7 +167,7 @@ class MassSpectrum():
 
         startTime = time.time()
         p1, success = optimize.leastsq(errorfunc, p0, args=(fixed_p_fwhh))
-        print "Optimisation took:", time.time()-startTime, "s"
+        print ("Optimisation took:", time.time()-startTime, "s")
         #print p1
 
         #update csds with optimised params
@@ -175,7 +175,7 @@ class MassSpectrum():
         #print params_per_csd
 
 
-        print "Updating CSD after optimisation"
+        print ("Updating CSD after optimisation")
         for i in range(len(self.csds)):
 
             print ('{0} {1} {2} {3}').format(params_per_csd[i][0], params_per_csd[i][1], params_per_csd[i][2], params_per_csd[i][3])
