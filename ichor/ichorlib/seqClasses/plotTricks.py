@@ -50,9 +50,9 @@ plt.ylim(-0.3, 0.9)
 # Provide tick lines across the plot to help your viewers trace along
 # the axis ticks. Make sure that the lines are light and small so they
 # don't obscure the primary data lines.
-print np.linspace(-0.2, 0.8, 11)
+print(np.linspace(-0.2, 0.8, 11))
 for y in np.linspace(-0.2, 0.8, 11):
-    plt.plot(range(0, 15), [y] * len(range(0, 15)), "--", lw=0.5, color="black", alpha=0.2)
+    plt.plot(list(range(0, 15)), [y] * len(list(range(0, 15))), "--", lw=0.5, color="black", alpha=0.2)
 
 # Remove the tick marks; they are unnecessary with the tick lines we just plotted.
 plt.tick_params(axis="both", which="both", bottom="off", top="off",

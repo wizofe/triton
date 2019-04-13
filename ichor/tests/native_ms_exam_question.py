@@ -37,7 +37,7 @@ csd.print_me()
 fig, ax1 = plt.subplots()
 
 xaxis = np.linspace(100, 6000, 10000)
-print xaxis
+print(xaxis)
 csd.plot_simulated_species(ax1, xaxis, fwhm=20)
 
 plt.show()

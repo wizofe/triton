@@ -18,7 +18,7 @@ def openAmphitriteProject(filename):
         # mz axis, atd axis, intensity matrix
         return [dataList[0], dataList[1], dataList[2]]
     except:
-        print 'Opening amphitrite file failed: %s' % filename
+        print('Opening amphitrite file failed: %s' % filename)
         return False
 
 
@@ -53,13 +53,13 @@ submatrix1 = matrix[1:200,1550:1600]
 submatrix2 = matrix[30:60,1:2000]
 
 
-print submatrix1
-print np.average(submatrix1)
-print np.max(submatrix1)
+print(submatrix1)
+print(np.average(submatrix1))
+print(np.max(submatrix1))
 
 grad = np.gradient(submatrix1)
 
-print grad[0]
+print(grad[0])
 
 fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(12, 4),
                                     sharex=False, sharey=False)

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import cPickle as pickle
+import pickle as pickle
 import ichorlib.msClasses.MsUtils as msutils
 from ichorlib.imClasses.Calibration_KT import CalibrationKT
 import os
@@ -27,7 +27,7 @@ class FileManipulations():
         self.poly_order = 1
 
         if smooth_data == True:
-            print('Smoothing... Smoothes {0} Window length {1} Polynomial order {2}').format(self.smoothes, self.window_len, self.poly_order)
+            print(('Smoothing... Smoothes {0} Window length {1} Polynomial order {2}').format(self.smoothes, self.window_len, self.poly_order))
 
         intensity_array = []
         atd_array = []
@@ -40,7 +40,7 @@ class FileManipulations():
             if temp_file.endswith(".txt"):
 
                 filepath = os.path.join(dir_path, temp_file)
-                print filepath
+                print(filepath)
 
                 temp_voltage = filepath.split('_')
                 temp_voltage = temp_voltage[-1].strip('.txt')
@@ -53,9 +53,9 @@ class FileManipulations():
                     stripped = x.strip('\r\n')
                     tokens = stripped.split('\t')
 
-                    print tokens[1]
+                    print(tokens[1])
                     e_notations = tokens[1].replace("E", "e")
-                    print e_notations
+                    print(e_notations)
                     result.append(float(e_notations))
 
                     if count == 1:  #only get the atd values once
@@ -70,7 +70,7 @@ class FileManipulations():
 
                 if smooth_data == True:
 
-                    for i in xrange(self.smoothes):
+                    for i in range(self.smoothes):
                         result = msutils.sg(result, window_size=self.window_len, order=self.poly_order)
 
 
@@ -111,13 +111,13 @@ class FileManipulations():
 
             if temp_file.endswith(".calibration"):
                 filepath = os.path.join(dir_path, temp_file)
-                print filepath
+                print(filepath)
 
                 cb = CalibrationKT()
 
                 calib = pickle.load(open(filepath))
 
-                print ('Calibrating... Charge: {0},  m/z: {1}, Coefficient A {2} Coefficient B {3}, Calibration R squared {4} Calibrant Wave Velocity {5} Data Wave Velocity {6}').format(charge, mz, calib.coefficientA, calib.coefficientB, calib.rSquared, calib.waveVelocity, wave_velocity)
+                print(('Calibrating... Charge: {0},  m/z: {1}, Coefficient A {2} Coefficient B {3}, Calibration R squared {4} Calibrant Wave Velocity {5} Data Wave Velocity {6}').format(charge, mz, calib.coefficientA, calib.coefficientB, calib.rSquared, calib.waveVelocity, wave_velocity))
 
                 atd_axis = np.asarray(data_frame.iloc[:, 0].values)
 

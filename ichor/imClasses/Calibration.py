@@ -10,7 +10,7 @@ from scipy import optimize
 from scipy.stats import pearsonr
 import collections
 import ichorlib.msClasses.MsUtils as utils
-import cPickle as pickle
+import pickle as pickle
 
 class Calibration():
     
@@ -46,7 +46,7 @@ class Calibration():
             str(self.gas)
             return True
         except:
-            print 'Calibration object broken or incomplete'
+            print('Calibration object broken or incomplete')
             return False
         
     ###########################################################################
@@ -57,16 +57,16 @@ class Calibration():
 
         :parameter calibrantObj: A Calibrant() object
         """
-        if not calibrantObj.name in self.calibrants.keys():
+        if not calibrantObj.name in list(self.calibrants.keys()):
             self.calibrants[calibrantObj.name] = calibrantObj
         else:
-            print'Calibrant of this type exists, remove before proceeding' 
+            print('Calibrant of this type exists, remove before proceeding') 
     def removeCalibrant(self,calibrantName):
         """Remove a calibrant from the calibration.
 
         :parameter calibrantName: Name of calibrant to be removed (dictionary key)
         """
-        if self.calibrants.has_key(calibrantName):
+        if calibrantName in self.calibrants:
             del self.calibrants[calibrantName]
             
     def createCalibration(self,waveVelocity,gas='Nitrogen'):
@@ -78,7 +78,7 @@ class Calibration():
         # getting the values to be fit
         tdsDoublePrime = []
         ccssPrime = []
-        for name in self.calibrants.keys():
+        for name in list(self.calibrants.keys()):
             self.calibrants[name].generateCorrectedTdsAndCcss(waveVelocity,gas)
             tdsDoublePrime += self.calibrants[name].getTdsDoublePrime()
             ccssPrime += self.calibrants[name].getCcssPrime()

@@ -19,15 +19,15 @@ filename = 'testing/degQMSMS-chargeStripped.txt'
 ms = MassSpectrum()
 ms.read_text_file(filename, grain=20, normalisationtype='bpi')
 
-print ms.xvals
+print(ms.xvals)
 
 pp = PeakPicking()
 gradient = pp.calculate_gradient(ms.xvals, ms.yvals)
-print pp.gradient
+print(pp.gradient)
 found_peaks = pp.find_peaks(1)
 ms.plot(ax2)
 for peak in found_peaks:
-    print found_peaks[peak][0], found_peaks[peak][1]
+    print(found_peaks[peak][0], found_peaks[peak][1])
     ax2.plot(found_peaks[peak][0], found_peaks[peak][1], 'rx')
 
 
@@ -39,7 +39,7 @@ ax3.plot(ms.xvals[ind], ms.yvals[ind], 'go')
 
 indexes = peakutils.indexes(ms.yvals, thres=0.0, min_dist=1)
 peaks_x = peakutils.interpolate(ms.xvals, ms.yvals, ind=indexes)
-print peaks_x
+print(peaks_x)
 
 ms.plot(ax4)
 ax4.plot(ms.xvals[indexes], ms.yvals[indexes], 'bo')

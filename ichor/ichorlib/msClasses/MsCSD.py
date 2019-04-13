@@ -30,18 +30,18 @@ class MsCSD():
 
     def print_me(self):
 
-        print ('{:-<50}').format("-")
+        print(('{:-<50}').format("-"))
 
-        print('CSD {0} csd_mass {1:8.2f} g_amp: {2:5.2f} g_mu: {3:5.2f} g_fwhh {4:5.2f}'
-            ' p_fwhh {5:5.2f} csd_mass_error {6:5.2f}'.format(self.name, self.csd_mass, self.g_amp, self.g_mu, self.g_fwhh, self.p_fwhh, self.csd_mass_error))
+        print(('CSD {0} csd_mass {1:8.2f} g_amp: {2:5.2f} g_mu: {3:5.2f} g_fwhh {4:5.2f}'
+            ' p_fwhh {5:5.2f} csd_mass_error {6:5.2f}'.format(self.name, self.csd_mass, self.g_amp, self.g_mu, self.g_fwhh, self.p_fwhh, self.csd_mass_error)))
 
         for cs in self.mspeaks:
-            print ('MS_peaks {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge)
+            print(('MS_peaks {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge))
 
         for cs in self.charges_to_fit:
-            print ('Charges_to_fit {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge)
+            print(('Charges_to_fit {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge))
 
-        print ('{:-<50}').format("-")
+        print(('{:-<50}').format("-"))
 
     def get_params_for_optimisation(self):
         """
@@ -98,7 +98,7 @@ class MsCSD():
         charges = collections.OrderedDict()
         lowest = 10000000
         lowest_z = 0
-        zs = xrange(1, 101)
+        zs = range(1, 101)
         for z in zs:
             charges[z] = []
             i = 0
@@ -107,7 +107,7 @@ class MsCSD():
                 i += 1
 
 
-        for z in charges.keys():
+        for z in list(charges.keys()):
             sd = np.std(charges[z])
             if sd < lowest:
                 lowest = sd
@@ -129,7 +129,7 @@ class MsCSD():
 
         self.csd_mass = np.average(charges[lowest_z])
         self.csd_mass_error = average_error
-        self.csd_charge_states = [lowest_z + i for i in xrange(len(mspeak_objects))]
+        self.csd_charge_states = [lowest_z + i for i in range(len(mspeak_objects))]
 
         # return np.average(charges[lowest_z]), average_error, [lowest_z + i for i in xrange(len(iarray))]
 
@@ -178,7 +178,7 @@ class MsCSD():
         p1, success = optimize.leastsq(errorfunc, p0[:], args=(xvals, yvals))
 
         if not success:
-            print 'Gaussian charge state distribution estimation failed'
+            print('Gaussian charge state distribution estimation failed')
             d = {}
             d['amplitude'] = h
             d['centre'] = c
@@ -375,13 +375,13 @@ class MsCSD():
         charges = collections.OrderedDict()
         lowest = 10000000
         lowest_z = 0
-        zs = xrange(1, 101)
+        zs = range(1, 101)
         for z in zs:
             charges[z] = []
             for i, mz in enumerate(iarray):
                 charges[z].append(msutils.calc_mass(mz, z + i))
 
-        for z in charges.keys():
+        for z in list(charges.keys()):
             sd = np.std(charges[z])
             if sd < lowest:
                 lowest = sd
@@ -395,7 +395,7 @@ class MsCSD():
 
         self.csd_mass = np.average(charges[lowest_z])
         self.csd_mass_error = average_error
-        self.csd_charge_states = [lowest_z + i for i in xrange(len(iarray))]
+        self.csd_charge_states = [lowest_z + i for i in range(len(iarray))]
 
 
         # return np.average(charges[lowest_z]), average_error, [lowest_z + i for i in xrange(len(iarray))]
