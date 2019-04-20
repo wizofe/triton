@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib as plt
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 
+
 class IMSpectrum(MassSpectrum):
 
     def __init__(self):
@@ -69,10 +70,10 @@ class IMSpectrum(MassSpectrum):
         indexmax = np.argmin(abs(self.atdaxis - atdmax))
         matrixslice = self.matrix[indexmin:indexmax, :]
         extractedMZIntensity = np.sum(matrixslice, axis=0)
-        print(('Reconstructing m/z for ATD range {0} - {1}'.format(atdmin, atdmax)))
+        print(('Reconstructing m/z for ATD range {0} - {1}'.format(
+            atdmin, atdmax)))
 
         return extractedMZIntensity
-
 
     # ================================================================= #
     # ====                      Plotting                           ==== #

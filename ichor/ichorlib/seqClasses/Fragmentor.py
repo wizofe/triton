@@ -18,7 +18,6 @@ class Fragmentor(object):
 
         print('I am the Fragmentor hahahaha!')
 
-
     def fragment_peptide(self, peptide_sequence):
         """Given a peptide sequence returns all a,b,c and x,y,z ions
 
@@ -30,12 +29,11 @@ class Fragmentor(object):
 
         peptidelength = len(peptide_sequence)
 
-        for i in range(0, peptidelength-1):
+        for i in range(0, peptidelength - 1):
 
-
-            sequence = peptide_sequence[:i+1]
+            sequence = peptide_sequence[:i + 1]
             position_from = 1
-            position_to = i+1
+            position_to = i + 1
 
             a_ion = 'a' + str(i + 1)
             b_ion = 'b' + str(i + 1)
@@ -52,15 +50,14 @@ class Fragmentor(object):
             cfragment.position_from = position_from
             cfragment.position_to = position_to
 
-
-            k = i+1
+            k = i + 1
 
             x_ion = 'x' + str(peptidelength - 1 - i)
             y_ion = 'y' + str(peptidelength - 1 - i)
             z_ion = 'z' + str(peptidelength - 1 - i)
 
             sequence = peptide_sequence[k:peptidelength]
-            position_from = k+1
+            position_from = k + 1
             position_to = peptidelength
 
             xfragment = PeptideFragment(sequence, x_ion)
@@ -92,7 +89,6 @@ class Fragmentor(object):
 
         return fragments
 
-
     def fragment_oligo(self, oligo_sequence):
         """
         Given an oligo sequence calculates all the fragments
@@ -103,11 +99,11 @@ class Fragmentor(object):
 
         oligo_length = len(oligo_sequence)
 
-        for i in range(0, oligo_length-1):
+        for i in range(0, oligo_length - 1):
 
-            sequence = oligo_sequence[:i+1]
+            sequence = oligo_sequence[:i + 1]
             position_from = 1
-            position_to = i+1
+            position_to = i + 1
 
             a_ion = 'a' + str(i + 1)
             b_ion = 'b' + str(i + 1)
@@ -128,7 +124,7 @@ class Fragmentor(object):
             dfragment.position_from = position_from
             dfragment.position_to = position_to
 
-            k = i+1
+            k = i + 1
 
             w_ion = 'w' + str(oligo_length - 1 - i)
             x_ion = 'x' + str(oligo_length - 1 - i)
@@ -136,7 +132,7 @@ class Fragmentor(object):
             z_ion = 'z' + str(oligo_length - 1 - i)
 
             sequence = oligo_sequence[k:oligo_length]
-            position_from = k+1
+            position_from = k + 1
             position_to = oligo_length
 
             wfragment = OligoFragment(sequence, w_ion)
@@ -173,7 +169,6 @@ class Fragmentor(object):
 
         return fragments
 
-
     def modifyFragments(self, fragments, typetomodify, modification):
         """
         TODO delete this and have it so that the matcher class performs the modifications
@@ -188,11 +183,9 @@ class Fragmentor(object):
 
         maxfragments = len(fragments)
 
-        for i in range(0,maxfragments):
-
+        for i in range(0, maxfragments):
 
             if fragments[i].ion[0] == typetomodify:
-
 
                 modfragment = copy.deepcopy(fragments[i])
 
@@ -203,6 +196,3 @@ class Fragmentor(object):
                 #print modfragment.printme()
 
         return modifiedfragments
-
-
-

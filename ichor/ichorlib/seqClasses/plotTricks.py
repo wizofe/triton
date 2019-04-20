@@ -1,11 +1,9 @@
 df = pd.read_csv('MNXLResultsTable.csv')
 
-
 ind = np.arange(len(df['NoV-Cor']))
 width = 0.2
 
 plt.figure()
-
 
 # These are the "Tableau 20" colors as RGB.
 tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
@@ -52,23 +50,47 @@ plt.ylim(-0.3, 0.9)
 # don't obscure the primary data lines.
 print(np.linspace(-0.2, 0.8, 11))
 for y in np.linspace(-0.2, 0.8, 11):
-    plt.plot(list(range(0, 15)), [y] * len(list(range(0, 15))), "--", lw=0.5, color="black", alpha=0.2)
+    plt.plot(list(range(0, 15)), [y] * len(list(range(0, 15))),
+             "--",
+             lw=0.5,
+             color="black",
+             alpha=0.2)
 
 # Remove the tick marks; they are unnecessary with the tick lines we just plotted.
-plt.tick_params(axis="both", which="both", bottom="off", top="off",
-                labelbottom="on", left="off", right="off", labelleft="on")
+plt.tick_params(axis="both",
+                which="both",
+                bottom="off",
+                top="off",
+                labelbottom="on",
+                left="off",
+                right="off",
+                labelleft="on")
 
 #rotate x-axis labels to fit on graph
 ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=90)
 
 plt.rcParams["font.family"] = "Arial"
 
+plt.bar(ind,
+        df['MMXL-Cor'],
+        width,
+        color=tableau20[0],
+        label='MNXL',
+        edgecolor="none")
+plt.bar(ind + width,
+        df['NoV-Cor'],
+        width,
+        color=tableau20[1],
+        label='NoV',
+        edgecolor="none")
+plt.bar(ind + width + width,
+        df['SoVD-Cor'],
+        width,
+        color=tableau20[2],
+        label='SoVD',
+        edgecolor="none")
+plt.xticks(ind, df['PDB'], fontsize=18)
+plt.yticks(fontsize=18)
 
-plt.bar(ind, df['MMXL-Cor'], width, color = tableau20[0], label = 'MNXL', edgecolor = "none")
-plt.bar(ind+width, df['NoV-Cor'], width, color = tableau20[1], label ='NoV', edgecolor = "none")
-plt.bar(ind+width+width, df['SoVD-Cor'], width, color = tableau20[2], label ='SoVD', edgecolor = "none")
-plt.xticks(ind , df['PDB'], fontsize = 18)
-plt.yticks(fontsize = 18)
-
-plt.legend(bbox_to_anchor=(1.0, 1), loc=0, borderaxespad=0., fontsize = 18)
+plt.legend(bbox_to_anchor=(1.0, 1), loc=0, borderaxespad=0., fontsize=18)
 plt.savefig('foo.png', dpi=300)

@@ -19,6 +19,6 @@ class PeptideFragment(Fragment):
         self.three_prime_end = 'OH'
 
     def __str__(self):
-        return 'Peptide  {0:<5} {1:<25} {2:<3} {3:<3} {4:<3} {5:<3}'.format(self.ion, self.sequence, self.position_from,
-                                                                      self.position_to, self.five_prime_end, self.three_prime_end)
-
+        return 'Peptide  {0:<5} {1:<25} {2:<3} {3:<3} {4:<3} {5:<3}'.format(
+            self.ion, self.sequence, self.position_from, self.position_to,
+            self.five_prime_end, self.three_prime_end)

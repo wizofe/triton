@@ -1,10 +1,10 @@
 import numpy as np
 from collections import OrderedDict
 from ichorlib.msClasses.MsPeak import MsPeak
-from . import detect_peaks 
+from . import detect_peaks
 
 
-class PeakPicking ():
+class PeakPicking():
 
     def __init__(self):
         """ Identify Peaks
@@ -12,11 +12,10 @@ class PeakPicking ():
         """
 
         self.gradient = [0]
-        self.xvals  = []
+        self.xvals = []
         self.yvals = []
 
         self.msPeaks = []
-
 
     def get_peaks_using_indexes(self, index_positions):
         """ Using an array which contains the indexes of peaks
@@ -25,8 +24,6 @@ class PeakPicking ():
         :return:
         """
         return [self.msPeaks[i] for i in index_positions]
-
-
 
     def calculate_gradient(self, xvals, yvals):
         """when reconstructing the data, make data[0] the start value,
@@ -39,16 +36,18 @@ class PeakPicking ():
         for i, x in enumerate(xvals):
             if i + 2 <= len(xvals):
                 try:
-                    gr = (float(yvals[i + 1]) - float(yvals[i])) / (float(xvals[i + 1]) - float(x))
+                    gr = (float(yvals[i + 1]) -
+                          float(yvals[i])) / (float(xvals[i + 1]) - float(x))
 
                 except:
-                    print('Gradient calculation: divide by 0 replaced by 0.000001')
+                    print(
+                        'Gradient calculation: divide by 0 replaced by 0.000001'
+                    )
                     gr = 0.000001
 
                 self.gradient.append(gr)
 
         self.gradient = np.array(self.gradient)
-
 
     def find_peaks(self, limit=0):
         """limit allows you to ignore slow peaks (remove noise)
@@ -60,20 +59,18 @@ class PeakPicking ():
         gPeaks = OrderedDict()
         found_peaks = OrderedDict()
 
-
-
         gradient_length = len(self.gradient)
         #print gradient_length
 
         count = 0
-        for i in range(0, gradient_length-1):
+        for i in range(0, gradient_length - 1):
             current_gradient = self.gradient[i]
             #print i, current_gradient
             if current_gradient > 0:
-                current_plusone_gradient = self.gradient[i+1]
+                current_plusone_gradient = self.gradient[i + 1]
                 if current_plusone_gradient <= 0:
 
-                    if(self.yvals[i] > limit):
+                    if (self.yvals[i] > limit):
                         found_peaks[count] = []
                         found_peaks[count].append(count)
                         found_peaks[count].append(self.xvals[i])
@@ -89,7 +86,6 @@ class PeakPicking ():
 
         #return found_peaks
         return self.msPeaks
-
 
     def find_peaks_back(self, limit=0):
         """limit allows you to ignore slow peaks (remove noise)
@@ -111,7 +107,8 @@ class PeakPicking ():
                         count += 1
         if limit:
             gPeaks_out = OrderedDict()
-            lim = max([gPeaks[x][1] for x in list(gPeaks.keys())]) * float(limit) / 100
+            lim = max([gPeaks[x][1] for x in list(gPeaks.keys())
+                      ]) * float(limit) / 100
             count = 0
             for i, (k, v) in enumerate(gPeaks.items()):
                 if v[1] > lim:

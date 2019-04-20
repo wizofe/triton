@@ -9,7 +9,7 @@ class IsotopeCalculator():
     def __init__(self):
         return
 
-    def get_orbitrap_resolution(self, mz, res_at_400 = 60000):
+    def get_orbitrap_resolution(self, mz, res_at_400=60000):
 
         ratio = np.divide(400., mz)
         resolution = np.sqrt(ratio) * res_at_400
@@ -57,4 +57,3 @@ class IsotopeCalculator():
         ms.yvals = results_df.iloc[:, 1].values
 
         return ms
-

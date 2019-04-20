@@ -6,6 +6,7 @@ import ichorlib.msClasses.MsUtils as msutils
 import matplotlib as plt
 import matplotlib.pyplot as pyplt
 
+
 class MassSpectrum():
 
     def __init__(self):
@@ -18,11 +19,13 @@ class MassSpectrum():
         self.originalyvals = []
         self.gradient = []
         self.normalisationtype = 'none'
-        self.csds = [] #holds MsCSD objects
+        self.csds = []  #holds MsCSD objects
 
-
-
-    def read_text_file(self, filename, x_range=0, grain=1, normalisationtype='none'):
+    def read_text_file(self,
+                       filename,
+                       x_range=0,
+                       grain=1,
+                       normalisationtype='none'):
         """ Reads in x y coordinate pairs from text file
         ' ' separator as in copy spectrum list in MassLynx
 
@@ -90,31 +93,30 @@ class MassSpectrum():
         self.yvals = self.originalyvals.copy()
         self.normalisationtype = 'none'
 
-    def smoothingSG(self,window_len=3,smoothes=2,poly_order=1):
+    def smoothingSG(self, window_len=3, smoothes=2, poly_order=1):
         '''Should only really be used on equally spaced data
         Actual window length used is 2*window_len+1 to avoid breakage'''
-        window_len = 2*window_len + 1
+        window_len = 2 * window_len + 1
         self.restore_raw_yvals()
         for i in range(smoothes):
-            self.yvals = msutils.sg(self.yvals,window_size=window_len,order=poly_order)
+            self.yvals = msutils.sg(self.yvals,
+                                    window_size=window_len,
+                                    order=poly_order)
         #self.normalisation_bpi()
 
-
     def simulateSpectrum(self, peak_shape='gaussian'):
-         """Builds a simulated spectrum using the fitted parameters of given species names.
+        """Builds a simulated spectrum using the fitted parameters of given species names.
          (uses the result of deconvolution)
          """
-         combined = np.zeros(len(self.xvals), dtype='float')
-         for csd in self.csds:
-             combined += csd.simulateSpecies(self.xvals)
+        combined = np.zeros(len(self.xvals), dtype='float')
+        for csd in self.csds:
+            combined += csd.simulateSpecies(self.xvals)
 
-         return combined
-
+        return combined
 
     def find_nearest(self, array, value):
         idx = (np.abs(array - value)).argmin()
         return idx
-
 
     def select_ms_range(self, min, max):
 
@@ -124,11 +126,11 @@ class MassSpectrum():
         min_index = self.find_nearest(self.xvals, min)
         max_index = self.find_nearest(self.xvals, max)
 
-        print(('Min {0} Max {1} Total length off original array {2}').format(min_index, max_index, len(self.originalxvals)))
+        print(('Min {0} Max {1} Total length off original array {2}').format(
+            min_index, max_index, len(self.originalxvals)))
 
-        self.xvals = self.xvals[min_index : max_index]
-        self.yvals = self.yvals[min_index : max_index]
-
+        self.xvals = self.xvals[min_index:max_index]
+        self.yvals = self.yvals[min_index:max_index]
 
     def select_topN_intensity_peaks(self, topN):
         """
@@ -145,8 +147,7 @@ class MassSpectrum():
         self.topN_xvals = self.xvals[index][-topN:]
         self.topN_yvals = self.yvals[index][-topN:]
 
-
-    def leastSquaresOptimisation(self,fixed_p_fwhh=0):
+    def leastSquaresOptimisation(self, fixed_p_fwhh=0):
         """
         if fixed_p_fwhh > 0 it uses the p_fwhm from the csd object
         do not optimise it
@@ -154,7 +155,8 @@ class MassSpectrum():
         :return:
         """
 
-        p0 = [] #change this to the current params from the CSD objects as they have aready been optimised somewhat
+        p0 = [
+        ]  #change this to the current params from the CSD objects as they have aready been optimised somewhat
 
         for csd in self.csds:
             p0.extend(csd.get_params_for_optimisation())
@@ -162,29 +164,32 @@ class MassSpectrum():
         #print p0
 
         # using scipy optimize
-        def errorfunc(p,fixed_p_fwhh):
-            return self.forLeastSquaresOptimisation(p, fixed_p_fwhh) - self.yvals
+        def errorfunc(p, fixed_p_fwhh):
+            return self.forLeastSquaresOptimisation(p,
+                                                    fixed_p_fwhh) - self.yvals
 
         startTime = time.time()
         p1, success = optimize.leastsq(errorfunc, p0, args=(fixed_p_fwhh))
-        print(("Optimisation took:", time.time()-startTime, "s"))
+        print(("Optimisation took:", time.time() - startTime, "s"))
         #print p1
 
         #update csds with optimised params
         params_per_csd = [p1[pos:pos + 5] for pos in range(0, len(p1), 5)]
         #print params_per_csd
 
-
-        print ("Updating CSD after optimisation")
+        print("Updating CSD after optimisation")
         for i in range(len(self.csds)):
 
-            print(('{0} {1} {2} {3}').format(params_per_csd[i][0], params_per_csd[i][1], params_per_csd[i][2], params_per_csd[i][3]))
+            print(('{0} {1} {2} {3}').format(params_per_csd[i][0],
+                                             params_per_csd[i][1],
+                                             params_per_csd[i][2],
+                                             params_per_csd[i][3]))
             self.csds[i].csd_mass = params_per_csd[i][0]
             self.csds[i].g_amp = params_per_csd[i][1]
             self.csds[i].g_mu = params_per_csd[i][2]
             self.csds[i].g_fwhh = params_per_csd[i][3]
 
-            if(fixed_p_fwhh > 0):
+            if (fixed_p_fwhh > 0):
                 self.csds[i].p_fwhh = fixed_p_fwhh
             else:
                 self.csds[i].p_fwhh = params_per_csd[i][4]
@@ -193,10 +198,7 @@ class MassSpectrum():
 
         return p1
 
-
-
     def forLeastSquaresOptimisation(self, p0, fixed_p_fwhh=False):
-
         """Creates the simulated mass spectrum for MassSpectrum.leastSquaresOptimisation().
          p0 - parameters to be used in simulation
          zs - charges to be simulated
@@ -217,18 +219,7 @@ class MassSpectrum():
             else:
                 self.csds[i].p_fwhh = params_per_csd[i][4]
 
-
         return self.simulateSpectrum()
-
-
-
-
-
-
-
-
-
-
 
     # def leastSquaresOptimisation(self,speciesNames,oneFwhm=False):
     #     """Deconvolute mass spectrum using non linear least squares.
@@ -265,7 +256,6 @@ class MassSpectrum():
     #             self.simulatedSpecies[speciesNames[i]].peakFwhm = p1[4]
     #     self.simulatedSpectrum = self._simulateSpectrum(speciesNames, self.xvals)
 
-
     # def forLeastSquaresOptimisation(self,p0,xvals,zs,oneFwhm):
     #     """Creates the simulated mass spectrum for MassSpectrum.leastSquaresOptimisation().
     #     p0 - parameters to be used in simulation
@@ -290,8 +280,6 @@ class MassSpectrum():
     #             else:
     #                 combined += utils.draw_peaks['hybrid'](xvals,amplitude,centre,p[4])
     #     return combined
-
-
 
     # ================================================================= #
     # ====                      Plotting                           ==== #
@@ -321,21 +309,25 @@ class MassSpectrum():
 
         return ln
 
-    def plot_simulated_spectrum_simple(self, ax, peakShape='gaussian',  **kwargs):
+    def plot_simulated_spectrum_simple(self, ax, peakShape='gaussian',
+                                       **kwargs):
         """ Plot the simulated spectrum based on the CSDs
         :param ax:
         :param xaxis:
         :return:
         """
 
-        ln = ax.plot(self.xvals, self.yvals, color = tableau20[0])
+        ln = ax.plot(self.xvals, self.yvals, color=tableau20[0])
         ax.set_ylabel('Intensity')
         ax.set_xlabel('$m/z$')
 
-
         return ln
 
-    def plot_simulated_spectrum(self, ax, showcharges='True', peakShape='gaussian',  **kwargs):
+    def plot_simulated_spectrum(self,
+                                ax,
+                                showcharges='True',
+                                peakShape='gaussian',
+                                **kwargs):
         """ Plot the simulated spectrum based on the CSDs
         :param ax:
         :param xaxis:
@@ -351,27 +343,30 @@ class MassSpectrum():
             yvals = csd.simulateSpecies(self.xvals) + offset
             max = yvals.max()
             xleft = self.xvals.max() - 300
-            ln = ax.plot(self.xvals, yvals, color = tableau20[color_index])
-            ln = ax.annotate('%.2f Da' % csd.csd_mass, xy=(xleft, offset+3),
-                        size=labelSize, horizontalalignment='right')
+            ln = ax.plot(self.xvals, yvals, color=tableau20[color_index])
+            ln = ax.annotate('%.2f Da' % csd.csd_mass,
+                             xy=(xleft, offset + 3),
+                             size=labelSize,
+                             horizontalalignment='right')
 
             if showcharges == 'True':
                 for peak in csd.charges_to_fit:
-                    ln = ax.text(peak.x, peak.y + offset, peak.charge, color = tableau20[color_index])
+                    ln = ax.text(peak.x,
+                                 peak.y + offset,
+                                 peak.charge,
+                                 color=tableau20[color_index])
 
             offset += 20
             color_index += 2
 
-
         offset += 100
         yvals = self.simulateSpectrum() + offset
-        ln = ax.plot(self.xvals, yvals, color = tableau20[2])
+        ln = ax.plot(self.xvals, yvals, color=tableau20[2])
 
         offset += 50
 
-        ln = ax.plot(self.xvals, self.yvals + offset, color = tableau20[0])
+        ln = ax.plot(self.xvals, self.yvals + offset, color=tableau20[0])
         ax.set_ylabel('Intensity')
         ax.set_xlabel('$m/z$')
-
 
         return ln

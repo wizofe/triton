@@ -22,6 +22,4 @@ class Fragment(object):
         self.mass = 0
         self.position_from = 0
         self.position_to = 0
-        self.amino_acid = '' # the amino acid identified from this fragment
-
-
+        self.amino_acid = ''  # the amino acid identified from this fragment

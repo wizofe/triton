@@ -1,10 +1,7 @@
 from pyteomics import mass
 import ichorlib.msClasses.MsUtils as msu
 
-
 __author__ = 'kthalassinos'
-
-
 
 
 class MassCalculator(object):
@@ -17,8 +14,7 @@ class MassCalculator(object):
     DNA_in_base = {}
     std_aa_mass = {}
 
-
-    def __init__(self, sequence='', z = 1, ion='H+', modification = ''):
+    def __init__(self, sequence='', z=1, ion='H+', modification=''):
         """
         Constructor
         Make it calculate it based on what type of ion it is
@@ -69,10 +65,7 @@ class MassCalculator(object):
             'W': 186.07931,
         }
 
-
-
-
-    def calc_mass(self, sequence='', z = 1, ion='H+', modification = ''):
+    def calc_mass(self, sequence='', z=1, ion='H+', modification=''):
         """
 
         Args:
@@ -85,7 +78,8 @@ class MassCalculator(object):
 
         """
 
-    def calc_peptide_fragment(self, peptide_sequence, peptide_name, peptide_five_prime_end, peptide_three_prime_end):
+    def calc_peptide_fragment(self, peptide_sequence, peptide_name,
+                              peptide_five_prime_end, peptide_three_prime_end):
         """
         This uses the pyteomics mass calculator. It assumes all peptides are
         H and OH as 5 and 3 prime ends.
@@ -114,13 +108,10 @@ class MassCalculator(object):
         if pep_type in ['b']:
             ion_mass += 0
 
-
-
         return ion_mass
 
-
-
-    def calc_oligo_fragment(self, oligo_sequence, oligo_name, oligo_five_prime_end, oligo_three_prime_end):
+    def calc_oligo_fragment(self, oligo_sequence, oligo_name,
+                            oligo_five_prime_end, oligo_three_prime_end):
         """
 
         Calculate the mass as follows:
@@ -138,7 +129,6 @@ class MassCalculator(object):
         oligo_type = oligo_name[0]
         #print oligo_type, oligo_length, oligo_five_prime_end, oligo_three_prime_end
 
-
         # calculate mass of ion as all others are based on this one
         ion_mass = 0
 
@@ -148,24 +138,30 @@ class MassCalculator(object):
             ion_mass += temp_mass
             ion_mass += self.DNA_in_base['DeoxyRibose']
 
-        mass_of_PO4 = (oligo_length-1) * (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 4 +
-                                            self.DNA_in_base['H'])
+        mass_of_PO4 = (oligo_length -
+                       1) * (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 4 +
+                             self.DNA_in_base['H'])
 
         ion_mass += mass_of_PO4
-        ion_mass += mass.calculate_mass(formula=oligo_five_prime_end) # usually default is OH
-        ion_mass += mass.calculate_mass(formula=oligo_three_prime_end) # usually default is OH
+        ion_mass += mass.calculate_mass(
+            formula=oligo_five_prime_end)  # usually default is OH
+        ion_mass += mass.calculate_mass(
+            formula=oligo_three_prime_end)  # usually default is OH
 
         if oligo_type in ['a']:
             ion_mass -= (self.DNA_in_base['O'] + self.DNA_in_base['H'] * 2)
         if oligo_type in ['b']:
             ion_mass += 0
         if oligo_type in ['c']:
-            ion_mass += (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 2 - self.DNA_in_base['H'])
+            ion_mass += (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 2 -
+                         self.DNA_in_base['H'])
         if oligo_type in ['d']:
-            ion_mass += (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 3 + self.DNA_in_base['H'])
+            ion_mass += (self.DNA_in_base['P'] + self.DNA_in_base['O'] * 3 +
+                         self.DNA_in_base['H'])
 
         if oligo_type in ['w']:
-            ion_mass += self.DNA_in_base['P'] + self.DNA_in_base['O'] + self.DNA_in_base['H']
+            ion_mass += self.DNA_in_base['P'] + self.DNA_in_base[
+                'O'] + self.DNA_in_base['H']
         if oligo_type in ['x']:
             ion_mass += self.DNA_in_base['P'] - self.DNA_in_base['H']
         if oligo_type in ['y']:
@@ -173,15 +169,7 @@ class MassCalculator(object):
         if oligo_type in ['z']:
             ion_mass -= self.DNA_in_base['O'] * 3 + self.DNA_in_base['H'] * 2
 
-        return abs(ion_mass) # in case ion s negative need to return the abs value
+        return abs(
+            ion_mass)  # in case ion s negative need to return the abs value
 
         #TODO potential bug for end fragments ie 20th in a 20mer oligo
-
-
-
-
-
-
-
-
-

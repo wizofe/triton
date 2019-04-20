@@ -3,7 +3,6 @@ from ichorlib.seqClasses.Fragment import Fragment
 __author__ = 'kthalassinos'
 
 
-
 class MatchedFragment(Fragment):
     """Class representing a fragment ion
 
@@ -12,7 +11,14 @@ class MatchedFragment(Fragment):
     based on the charge (z) that is required
     """
 
-    def __init__(self, sequence='', ion='', z=1, mz_theoretical=0, mz_experimental=0, modification=0, ppm=0):
+    def __init__(self,
+                 sequence='',
+                 ion='',
+                 z=1,
+                 mz_theoretical=0,
+                 mz_experimental=0,
+                 modification=0,
+                 ppm=0):
         """
         Constructor
         """

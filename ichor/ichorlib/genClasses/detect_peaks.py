@@ -1,6 +1,5 @@
 """Detect peaks in data based on their amplitude and other features."""
 
-
 import numpy as np
 
 __author__ = "Marcos Duarte, https://github.com/demotu/BMC"
@@ -8,8 +7,15 @@ __version__ = "1.0.4"
 __license__ = "MIT"
 
 
-def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
-                 kpsh=False, valley=False, show=False, ax=None):
+def detect_peaks(x,
+                 mph=None,
+                 mpd=1,
+                 threshold=0,
+                 edge='rising',
+                 kpsh=False,
+                 valley=False,
+                 show=False,
+                 ax=None):
     """Detect peaks in data based on their amplitude and other features.
 
     Parameters
@@ -101,14 +107,19 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         ine = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) > 0))[0]
     else:
         if edge.lower() in ['rising', 'both']:
-            ire = np.where((np.hstack((dx, 0)) <= 0) & (np.hstack((0, dx)) > 0))[0]
+            ire = np.where((np.hstack((dx, 0)) <= 0) &
+                           (np.hstack((0, dx)) > 0))[0]
         if edge.lower() in ['falling', 'both']:
-            ife = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) >= 0))[0]
+            ife = np.where((np.hstack((dx, 0)) < 0) &
+                           (np.hstack((0, dx)) >= 0))[0]
     ind = np.unique(np.hstack((ine, ire, ife)))
     # handle NaN's
     if ind.size and indnan.size:
         # NaN's and values close to NaN's cannot be peaks
-        ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan - 1, indnan + 1))), invert=True)]
+        ind = ind[np.in1d(ind,
+                          np.unique(np.hstack(
+                              (indnan, indnan - 1, indnan + 1))),
+                          invert=True)]
     # first and last values of x cannot be peaks
     if ind.size and ind[0] == 0:
         ind = ind[1:]
@@ -119,7 +130,8 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         ind = ind[x[ind] >= mph]
     # remove peaks - neighbors < threshold
     if ind.size and threshold > 0:
-        dx = np.min(np.vstack([x[ind] - x[ind - 1], x[ind] - x[ind + 1]]), axis=0)
+        dx = np.min(np.vstack([x[ind] - x[ind - 1], x[ind] - x[ind + 1]]),
+                    axis=0)
         ind = np.delete(ind, np.where(dx < threshold)[0])
     # detect small peaks closer than minimum peak distance
     if ind.size and mpd > 1:
@@ -158,7 +170,13 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
         if ind.size:
             label = 'valley' if valley else 'peak'
             label = label + 's' if ind.size > 1 else label
-            ax.plot(ind, x[ind], '+', mfc=None, mec='r', mew=2, ms=8,
+            ax.plot(ind,
+                    x[ind],
+                    '+',
+                    mfc=None,
+                    mec='r',
+                    mew=2,
+                    ms=8,
                     label='%d %s' % (ind.size, label))
             ax.legend(loc='best', framealpha=.5, numpoints=1)
         ax.set_xlim(-.02 * x.size, x.size * 1.02 - 1)
@@ -168,9 +186,8 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
         ax.set_xlabel('Data #', fontsize=14)
         ax.set_ylabel('Amplitude', fontsize=14)
         mode = 'Valley detection' if valley else 'Peak detection'
-        ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
-                     % (mode, str(mph), mpd, str(threshold), edge))
+        ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')" %
+                     (mode, str(mph), mpd, str(threshold), edge))
         # plt.grid()
         #return ax
         plt.show()
-

@@ -36,25 +36,36 @@ class Scorer(object):
         df = pd.DataFrame.from_csv(filepath)
         return df
 
-
     def simple_score(self, df):
 
         #split the Ion column into ion type and ion number
-        df = df.join(df.Ion.str.extract('([a-z]|[A-Z])([0-9]*)', expand=True).rename(columns={0: 'Ion_type'}))
-        new_ppm_bins = [-10, 0., 5., 10., 50., 100,
-                        500]  # i add the -10 as the first value so to avoid having 0 in the resulting bins
+        df = df.join(
+            df.Ion.str.extract('([a-z]|[A-Z])([0-9]*)',
+                               expand=True).rename(columns={0: 'Ion_type'}))
+        new_ppm_bins = [
+            -10, 0., 5., 10., 50., 100, 500
+        ]  # i add the -10 as the first value so to avoid having 0 in the resulting bins
         df['ppm_bins'] = pd.cut(abs(df.ppm), new_ppm_bins, labels=False)
         new_intensity_bins = [-10, 0., 5., 10., 25., 50., 100]
-        df['intensity_bins'] = pd.cut(df.Intensity, new_intensity_bins, labels=False)
-        df = df.assign(Inten_weighted_ppm_2=lambda df: abs(
-            df.intensity_bins / df.ppm_bins))  # for this score to work need to remove the precursor and rescale remaining intensities!!!
+        df['intensity_bins'] = pd.cut(df.Intensity,
+                                      new_intensity_bins,
+                                      labels=False)
+        df = df.assign(
+            Inten_weighted_ppm_2=lambda df: abs(df.intensity_bins / df.ppm_bins)
+        )  # for this score to work need to remove the precursor and rescale remaining intensities!!!
 
         score = df.Inten_weighted_ppm_2.sum()
 
-
         return score
 
-    def calc_match_statistics(self, oligo, charges, modifications, ms, ppm_error, score_to_test, random_oligo_to_test = 1000):
+    def calc_match_statistics(self,
+                              oligo,
+                              charges,
+                              modifications,
+                              ms,
+                              ppm_error,
+                              score_to_test,
+                              random_oligo_to_test=1000):
 
         fr = Fragmentor()
         matcher = Matcher()
@@ -68,11 +79,14 @@ class Scorer(object):
 
         for i in range(random_oligo_to_test):
 
-            random_oligo = "".join(choice(allchar) for _ in range(randint(min_char, max_char)))
+            random_oligo = "".join(
+                choice(allchar) for _ in range(randint(min_char, max_char)))
 
             fragments = fr.fragment_oligo(random_oligo)
-            df_search_space = matcher.create_search_space(fragments, charges, modifications)
-            df_results = matcher.match_oligo_fragments_pandas(df_search_space, ms, ppm_error)
+            df_search_space = matcher.create_search_space(
+                fragments, charges, modifications)
+            df_results = matcher.match_oligo_fragments_pandas(
+                df_search_space, ms, ppm_error)
 
             score = self.simple_score(df_results)
 
@@ -86,7 +100,8 @@ class Scorer(object):
         c = extreme_fit[0]
         loc = extreme_fit[1]
         scale = extreme_fit[2]
-        print(("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(c, loc, scale))
+        print(("Extreme value fits c = {0}, loc = {1}, scale = {2}").format(
+            c, loc, scale))
 
         extreme_to_plot = genextreme(c, loc, scale)
         p_value = extreme_to_plot.pdf(score_to_test)
@@ -94,10 +109,11 @@ class Scorer(object):
 
         return dist_df, p_value, score_to_test, extreme_to_plot
 
+    def plot_match_statistics(self, dist_df, p_value, score_to_test,
+                              extreme_to_plot):
 
-    def plot_match_statistics(self, dist_df, p_value, score_to_test, extreme_to_plot):
-
-        string_to_print = ("p value of score {0} = {1}").format(score_to_test, p_value)
+        string_to_print = ("p value of score {0} = {1}").format(
+            score_to_test, p_value)
         x_axes_min_val = dist_df.Score.min() - 5
         x_axes_max_val = dist_df.Score.max() + 5
         ax1 = sns.distplot(dist_df.Score, fit=genextreme, kde=False)
@@ -109,9 +125,3 @@ class Scorer(object):
         ax1.set_ylabel('number of matches')
 
         return ax1
-
-
-
-
-
-

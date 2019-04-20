@@ -1,12 +1,16 @@
 __author__ = 'kthalassinos'
 
-class Modification(object):
 
+class Modification(object):
     """Class representing a modification
 
     """
 
-    def __init__(self, name='', formula='', residue_affected = '', fixed_modification = 0):
+    def __init__(self,
+                 name='',
+                 formula='',
+                 residue_affected='',
+                 fixed_modification=0):
         """
         Constructor
         """

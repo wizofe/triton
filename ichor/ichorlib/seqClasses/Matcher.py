@@ -1,14 +1,13 @@
 __author__ = 'kthalassinos'
 
 
-
 class Matcher(object):
     """Class that performs the match between experimental and theoretical masses
 
     Here modifications and what charge states to be conidered are specified.
     """
 
-    def __init__(self, sequence='', ion='', modification = ''):
+    def __init__(self, sequence='', ion='', modification=''):
         """
         Constructor
         """
@@ -22,5 +21,3 @@ class Matcher(object):
 
     def print_me(self):
         return "Matcher ", self.ion, self.sequence, self.modification, self.position_from, self.position_to, self.mass
-
-

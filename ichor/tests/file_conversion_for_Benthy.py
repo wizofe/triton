@@ -10,7 +10,8 @@ cb = CalibrationKT()
 out_base_dir = '/Users/Kostas/work2018/2-Collaborations/Claire_CIU/output/'
 
 dir_recomb_paths = []
-dir_recomb_paths.append('/Users/Kostas/work2018/2-Collaborations/Claire_CIU/test')
+dir_recomb_paths.append(
+    '/Users/Kostas/work2018/2-Collaborations/Claire_CIU/test')
 
 #TODO!!!!!!!!!! make sure to use the right values here
 plus_mz = 3920
@@ -20,25 +21,17 @@ for dir_path in dir_recomb_paths:
 
     print(dir_path)
     file_ending = dir_path.split('/')
-    exp_description = '' + file_ending[-3] + '_' + file_ending[-2] + '_' +file_ending[-1] + ''
+    exp_description = '' + file_ending[-3] + '_' + file_ending[
+        -2] + '_' + file_ending[-1] + ''
     output_file = out_base_dir + exp_description + '_combined.txt'
 
     print(output_file)
 
-    data = fm.dir_to_challenger_input(output_file, dir_path,
-                                      exp_name = exp_description, smooth_data = True,
-                                      calibrate = False)
-
-
-
-
-
-
-
-
-
-
-
+    data = fm.dir_to_challenger_input(output_file,
+                                      dir_path,
+                                      exp_name=exp_description,
+                                      smooth_data=True,
+                                      calibrate=False)
 
     # atd_axis = np.asarray(data.iloc[:, 0].values)
     # print atd_axis

@@ -15,12 +15,13 @@ class MsPeak():
         self.id = 0
 
     def __repr__(self):
-        return "[MsPeak] id {0} m/z {1} intensity {2} charge {3}".format(self.id, self.x, self.y, self.charge)
+        return "[MsPeak] id {0} m/z {1} intensity {2} charge {3}".format(
+            self.id, self.x, self.y, self.charge)
 
     def __getitem__(self, item):
         return self.x
 
-    def simulate_peak(self, xaxis, fwhm = 10, peak_shape='gaussian'):
+    def simulate_peak(self, xaxis, fwhm=10, peak_shape='gaussian'):
         """ This method simulates the intensity of a peak using a peak shape and an x-axis as inputs
 
         :return:
@@ -32,7 +33,7 @@ class MsPeak():
         else:
             return self.gaussian(xaxis, self.y, self.x, fwhm)
 
-    def gaussian(self, mzs,amp,mu,fwhh):
+    def gaussian(self, mzs, amp, mu, fwhh):
         """Calculate a three parameter Gaussian distribution.
 
         :parameter mzs: x axis (numpy array or float)
@@ -40,9 +41,10 @@ class MsPeak():
         :parameter mu: Mean/centre of the distribution
         :parameter fwhh: Width of distribution (full width half maximum)
         """
-        return amp*np.exp((-(mzs-mu)**2)/(2*(fwhh/2.3548200450309493)**2))
+        return amp * np.exp(
+            (-(mzs - mu)**2) / (2 * (fwhh / 2.3548200450309493)**2))
 
-    def lorentzian(self, mzs,amp,mu,fwhh):
+    def lorentzian(self, mzs, amp, mu, fwhh):
         """Calculate a three parameter Lorentzian (Cauchy) distribution.
 
         :parameter mzs: x axis (numpy array or float)
@@ -50,9 +52,9 @@ class MsPeak():
         :parameter mu: Mean/centre of the distribution
         :parameter fwhm: Width of distribution (full width half maximum)
         """
-        return amp*1/(np.abs(1+((mu-mzs)/(fwhh/2))**2))
+        return amp * 1 / (np.abs(1 + ((mu - mzs) / (fwhh / 2))**2))
 
-    def hybrid(self, mzs,amp,mu,fwhh):
+    def hybrid(self, mzs, amp, mu, fwhh):
         """Calculate a three parameter hybrid distribution. Distribution is
         Gaussian at values less than the mean and Lorentzian above it.
 
@@ -62,17 +64,24 @@ class MsPeak():
         :parameter fwhh: Width of distribution (full width half maximum)
         """
         ys = mzs.copy()
-        ys[mzs<=mu] = amp*np.exp((-(mzs[mzs<=mu]-mu)**2)/(2*(fwhh/(2*np.sqrt(2*np.log(2))))**2))
-        ys[mzs>mu] = amp*1/(np.abs(1+((mu-mzs[mzs>mu])/(fwhh/2))**2))
+        ys[mzs <= mu] = amp * np.exp(
+            (-(mzs[mzs <= mu] - mu)**2) /
+            (2 * (fwhh / (2 * np.sqrt(2 * np.log(2))))**2))
+        ys[mzs > mu] = amp * 1 / (np.abs(1 + ((mu - mzs[mzs > mu]) /
+                                              (fwhh / 2))**2))
 
         return ys
-
 
     # ================================================================= #
     # ====                      Plotting                           ==== #
     # ================================================================= #
 
-    def plotSimulatedPeak(self, ax, xaxis, fwhm = 10, peakShape='gaussian', **kwargs):
+    def plotSimulatedPeak(self,
+                          ax,
+                          xaxis,
+                          fwhm=10,
+                          peakShape='gaussian',
+                          **kwargs):
         #TODO add switches here to also plot m/z or z with the peak
         """ Plot the simulated peak
 
@@ -83,7 +92,8 @@ class MsPeak():
         :param kwargs:
         :return:
         """
-        text_to_plot = str(self.id) # + " " + str(self.charge)
-        ln = ax.plot(xaxis, self.simulate_peak(xaxis, fwhm, peakShape), **kwargs)
+        text_to_plot = str(self.id)  # + " " + str(self.charge)
+        ln = ax.plot(xaxis, self.simulate_peak(xaxis, fwhm, peakShape),
+                     **kwargs)
         ln = ax.text(self.x, self.y, text_to_plot)
         return ln

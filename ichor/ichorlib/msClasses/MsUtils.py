@@ -21,25 +21,24 @@ std_aa_mass = {
     'R': 156.10111,
     'Y': 163.06333,
     'W': 186.07931,
-    }
+}
 """A dictionary with monoisotopic masses of the twenty standard
 amino acid residues.
 """
 
 nist_mass_mono = {
-
     'H+': 1.00727646677,
     'e*': 0.00054857990943,
-    'C':  12.0,
-    'H':  1.00782503207,
-    'N':  14.0030740048,
-    'O':  15.99491461956,
-    'S':  31.972071,
+    'C': 12.0,
+    'H': 1.00782503207,
+    'N': 14.0030740048,
+    'O': 15.99491461956,
+    'S': 31.972071,
     'Na': 22.9897692809,
-    'P':  30.97376163,
-    'K':  38.96370668,
-
+    'P': 30.97376163,
+    'K': 38.96370668,
 }
+
 
 def calc_mass(mz, z):
     """Calculate the mass given m/z value and charge state.
@@ -48,16 +47,18 @@ def calc_mass(mz, z):
     :parameter z: Charge state
     :returns: mass (Da)
     """
-    return z*float(mz) - (z*nist_mass_mono['H+'])
+    return z * float(mz) - (z * nist_mass_mono['H+'])
 
-def calc_mz(mass,z):
+
+def calc_mz(mass, z):
     """Calculate the m/z value given the mass and charge.
 
     :parameter mass: Mass of protein/molecule
     :parameter z: Charge state
     :returns: m/z value (Th)
     """
-    return (float(mass) + (z*nist_mass_mono['H+']))/(z)
+    return (float(mass) + (z * nist_mass_mono['H+'])) / (z)
+
 
 def calcppmerror(experimental_mass, theoretical_mass):
     """
@@ -72,6 +73,7 @@ def calcppmerror(experimental_mass, theoretical_mass):
     """
     return ((experimental_mass - theoretical_mass) / theoretical_mass) * 1000000
 
+
 def calc_daltons_from_ppm(mass, ppm):
     """
 
@@ -84,6 +86,7 @@ def calc_daltons_from_ppm(mass, ppm):
     """
     return mass - ((mass * 1000000) / (ppm + 1000000))
 
+
 def gaussian(mzs, amp, mu, fwhh):
     """Calculate a three parameter Gaussian distribution.
 
@@ -93,7 +96,8 @@ def gaussian(mzs, amp, mu, fwhh):
     :parameter fwhh: Width of distribution (full width half maximum)
     """
 
-    return amp * np.exp((-(mzs - mu) ** 2) / (2 * (fwhh / 2.3548200450309493) ** 2))
+    return amp * np.exp((-(mzs - mu)**2) / (2 * (fwhh / 2.3548200450309493)**2))
+
 
 def lorentzian(mzs, amp, mu, fwhh):
     """Calculate a three parameter Lorentzian (Cauchy) distribution.
@@ -103,7 +107,8 @@ def lorentzian(mzs, amp, mu, fwhh):
     :parameter mu: Mean/centre of the distribution
     :parameter fwhm: Width of distribution (full width half maximum)
         """
-    return amp * 1 / (np.abs(1 + ((mu - mzs) / (fwhh / 2)) ** 2))
+    return amp * 1 / (np.abs(1 + ((mu - mzs) / (fwhh / 2))**2))
+
 
 def hybrid(mzs, amp, mu, fwhh):
     """Calculate a three parameter hybrid distribution. Distribution is
@@ -115,8 +120,10 @@ def hybrid(mzs, amp, mu, fwhh):
     :parameter fwhh: Width of distribution (full width half maximum)
     """
     ys = mzs.copy()
-    ys[mzs <= mu] = amp * np.exp((-(mzs[mzs <= mu] - mu) ** 2) / (2 * (fwhh / (2 * np.sqrt(2 * np.log(2)))) ** 2))
-    ys[mzs > mu] = amp * 1 / (np.abs(1 + ((mu - mzs[mzs > mu]) / (fwhh / 2)) ** 2))
+    ys[mzs <= mu] = amp * np.exp((-(mzs[mzs <= mu] - mu)**2) /
+                                 (2 * (fwhh / (2 * np.sqrt(2 * np.log(2))))**2))
+    ys[mzs > mu] = amp * 1 / (np.abs(1 + ((mu - mzs[mzs > mu]) /
+                                          (fwhh / 2))**2))
 
     return ys
 
@@ -184,7 +191,9 @@ def sg(y, window_size, order, deriv=0):
     order_range = list(range(order + 1))
     half_window = (window_size - 1) // 2
     # precompute coefficients
-    b = np.mat([[k ** i for i in order_range] for k in range(-half_window, half_window + 1)])
+    b = np.mat([[k**i
+                 for i in order_range]
+                for k in range(-half_window, half_window + 1)])
     m = np.linalg.pinv(b).A[deriv]
     # pad the signal at the extremes with
     # values taken from the signal itself

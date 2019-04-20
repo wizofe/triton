@@ -7,7 +7,9 @@ import collections
 #TODO add the xaxis here or pass the MassSpectrum object so you don't have to keep
 # adding the xaxis in each function
 
+
 class MsCSD():
+
     def __init__(self):
         """ Describe a charge state distribution CSD. This contains peaks that follow a
         Gaussian distribution, can calculate a mass from and used to simulate a spectrum
@@ -24,22 +26,28 @@ class MsCSD():
         self.csd_mass = 0
         self.csd_mass_error = 0
         self.csd_charge_states = []
-        self.charges_to_fit = []  # MsPeak objects from the ones calculated from the estimate charges function
-        self.charges_to_fit_all = [] # hold all peaks corresponding to charges identified use it as a backup for when filtering
-
+        self.charges_to_fit = [
+        ]  # MsPeak objects from the ones calculated from the estimate charges function
+        self.charges_to_fit_all = [
+        ]  # hold all peaks corresponding to charges identified use it as a backup for when filtering
 
     def print_me(self):
 
         print(('{:-<50}').format("-"))
 
-        print(('CSD {0} csd_mass {1:8.2f} g_amp: {2:5.2f} g_mu: {3:5.2f} g_fwhh {4:5.2f}'
-            ' p_fwhh {5:5.2f} csd_mass_error {6:5.2f}'.format(self.name, self.csd_mass, self.g_amp, self.g_mu, self.g_fwhh, self.p_fwhh, self.csd_mass_error)))
+        print((
+            'CSD {0} csd_mass {1:8.2f} g_amp: {2:5.2f} g_mu: {3:5.2f} g_fwhh {4:5.2f}'
+            ' p_fwhh {5:5.2f} csd_mass_error {6:5.2f}'.format(
+                self.name, self.csd_mass, self.g_amp, self.g_mu, self.g_fwhh,
+                self.p_fwhh, self.csd_mass_error)))
 
         for cs in self.mspeaks:
-            print(('MS_peaks {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge))
+            print(('MS_peaks {0} {1} {2} {3}').format(cs.id, cs.x, cs.y,
+                                                      cs.charge))
 
         for cs in self.charges_to_fit:
-            print(('Charges_to_fit {0} {1} {2} {3}').format(cs.id, cs.x, cs.y, cs.charge))
+            print(('Charges_to_fit {0} {1} {2} {3}').format(
+                cs.id, cs.x, cs.y, cs.charge))
 
         print(('{:-<50}').format("-"))
 
@@ -83,8 +91,6 @@ class MsCSD():
 
         self.mspeaks.append(mypeak)
 
-
-
     def calculateMassAndCharges(self, mspeak_objects):
         """Calculate the mass of a molecular species using the given m/z
         values.
@@ -106,7 +112,6 @@ class MsCSD():
                 charges[z].append(msutils.calc_mass(peak.x, z + i))
                 i += 1
 
-
         for z in list(charges.keys()):
             sd = np.std(charges[z])
             if sd < lowest:
@@ -125,14 +130,13 @@ class MsCSD():
             peak.charge = counter
             counter += 1
 
-
-
         self.csd_mass = np.average(charges[lowest_z])
         self.csd_mass_error = average_error
-        self.csd_charge_states = [lowest_z + i for i in range(len(mspeak_objects))]
+        self.csd_charge_states = [
+            lowest_z + i for i in range(len(mspeak_objects))
+        ]
 
         # return np.average(charges[lowest_z]), average_error, [lowest_z + i for i in xrange(len(iarray))]
-
 
     def estimateParameters(self, xvals, yvals):
         """| Estimate values for the 3 parameter Gaussian
@@ -198,7 +202,7 @@ class MsCSD():
 
         #print(
         #'Optimised Gaussian  Mean: {0:8.2f} Amplitute: {1:5.2f}  FWHH: {2:8.2f}'.format(d['centre'], d['amplitude'],
-         #                                                                               d['fwhm']))
+        #                                                                               d['fwhm']))
 
         return d
 
@@ -208,8 +212,8 @@ class MsCSD():
         :param xaxis:
         :return:
         """
-        return self.g_amp * np.exp((-(mz_value - self.g_mu) ** 2) / (2 * (self.g_fwhh / 2.3548200450309493) ** 2))
-
+        return self.g_amp * np.exp((-(mz_value - self.g_mu)**2) /
+                                   (2 * (self.g_fwhh / 2.3548200450309493)**2))
 
     def estimateCharges(self, limit=1):
         """Estimate charges to be simulated by fitting the charge state
@@ -240,9 +244,7 @@ class MsCSD():
                 self.charges_to_fit.append(temp_peak)
                 #print('Charges to simulate: z: {0:8.2f} xval: {1:5.2f}  height: {2:8.2f} limit: {3:8.2f}'.format(z, xval,height,self.g_amp * (float(limit) / 100)))
 
-
         return charges
-
 
     def update_mass_after_optimisation(self):
         """
@@ -255,7 +257,6 @@ class MsCSD():
             peak.x = msutils.calc_mz(self.csd_mass, peak.charge)
             peak.y = self.calc_amplitude(peak.x)
 
-
     def filter_theoretical_peaks_using_charges(self, charges_array):
         """ Using an array which contains the charges (z) of peaks
          return an array with those msPeaks
@@ -263,7 +264,7 @@ class MsCSD():
         :return:
         """
 
-        charges_to_fit_all = self.charges_to_fit #make a copy of the unfiltered list
+        charges_to_fit_all = self.charges_to_fit  #make a copy of the unfiltered list
         filtered_peaks = []
 
         for peak in self.charges_to_fit:
@@ -273,14 +274,13 @@ class MsCSD():
         self.charges_to_fit = filtered_peaks
         return filtered_peaks
 
-
-    def simulateSpecies(self,xvals,peakShape='gaussian'):
+    def simulateSpecies(self, xvals, peakShape='gaussian'):
         """Simulates a mass spectrum using the object's attributes
         Valid peak shapes are: 'hybrid', 'gaussian' & 'lorentzian
         if one_fwhh is to be used be sure to set self.peakFwhm before
         calling this function.
         """
-        combined = np.zeros(len(xvals),dtype='float')
+        combined = np.zeros(len(xvals), dtype='float')
         for peak in self.charges_to_fit:
             z = peak.charge
             centre = msutils.calc_mz(self.csd_mass, z)
@@ -290,8 +290,7 @@ class MsCSD():
 
         return combined
 
-
-    def simulateSpecies_back(self,xvals,peak_shape='gaussian'):
+    def simulateSpecies_back(self, xvals, peak_shape='gaussian'):
         """Simulates a mass spectrum using the object's attributes
         This uses charges to simulate NOT the experimental peaks
         Valid peak shapes are: 'hybrid', 'gaussian' & 'lorentzian
@@ -300,17 +299,23 @@ class MsCSD():
         If you want to selectively simulate charge states then need to call
         filter_theoretical_peaks_using_charges before this
         """
-        combined = np.zeros(len(xvals),dtype='float')
+        combined = np.zeros(len(xvals), dtype='float')
         for peak in self.charges_to_fit:
-            combined += peak.simulate_peak(xvals, fwhm=self.p_fwhh, peak_shape=peak_shape)
+            combined += peak.simulate_peak(xvals,
+                                           fwhm=self.p_fwhh,
+                                           peak_shape=peak_shape)
         return combined
-
 
     # ================================================================= #
     # ====                      Plotting                           ==== #
     # ================================================================= #
 
-    def plot_csd_gaussian(self, ax, xaxis, fwhm=10, peakShape='gaussian', **kwargs):
+    def plot_csd_gaussian(self,
+                          ax,
+                          xaxis,
+                          fwhm=10,
+                          peakShape='gaussian',
+                          **kwargs):
         """ Plot the overall Gaussian which encompases the CSD
         :param ax:
         :param xaxis:
@@ -319,12 +324,18 @@ class MsCSD():
         y_offset = 3
 
         text_to_plot = str(self.name) + " " + str(self.csd_mass)
-        ln = ax.plot(xaxis, msutils.gaussian(xaxis, self.g_amp, self.g_mu, self.g_fwhh), **kwargs)
+        ln = ax.plot(
+            xaxis, msutils.gaussian(xaxis, self.g_amp, self.g_mu, self.g_fwhh),
+            **kwargs)
         ln = ax.text(self.g_mu, self.g_amp + y_offset, text_to_plot)
         return ln
 
-
-    def plot_simulated_species(self, ax, xaxis, fwhm=10, peakShape='gaussian', **kwargs):
+    def plot_simulated_species(self,
+                               ax,
+                               xaxis,
+                               fwhm=10,
+                               peakShape='gaussian',
+                               **kwargs):
         """ Plot the CSD based on all the charge states to be considered NOT the experimentaly selected ones
         :param ax:
         :param xaxis:
@@ -352,11 +363,6 @@ class MsCSD():
             ln = ax.plot(peak.x, residual, **kwargs)
 
         return ln
-
-
-
-
-
 
     def calculateMassAndChargesBACK(self):
         """Calculate the mass of a molecular species using the given m/z
@@ -396,6 +402,5 @@ class MsCSD():
         self.csd_mass = np.average(charges[lowest_z])
         self.csd_mass_error = average_error
         self.csd_charge_states = [lowest_z + i for i in range(len(iarray))]
-
 
         # return np.average(charges[lowest_z]), average_error, [lowest_z + i for i in xrange(len(iarray))]
