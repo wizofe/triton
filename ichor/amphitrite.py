@@ -26,7 +26,14 @@ def plot_atd(filename):
     Returns:
     It shows a plot. TODO: Return a matplotlib/plotly/JSON object
     """
-    global ms
+    return
+
+
+def main():
+    # Main data file
+    filename = 'data/degQMSMS-chargeStripped.txt'
+
+    # Plot the ATD
     ms = MassSpectrum()
     ms.read_text_file(filename, grain=grain_param, normalisationtype='bpi')
     ms.smoothingSG(poly_order=poly_order_param,
@@ -36,20 +43,8 @@ def plot_atd(filename):
     #ms.select_ms_range(4200,9000)
 
     fig = plt.figure(figsize=(12, 8))
-    ax = plt.subplot(111)
-    ms.plot_simulated_spectrum_simple(ax, color=tableau20[4])
-
-    plt.show()
-
-    return tls.mpl_to_plotly(fig)
-
-
-def main():
-    # Main data file
-    filename = 'data/degQMSMS-chargeStripped.txt'
-
-    # Plot the ATD
-    plot_atd(filename)
+    ax = plt.subplot(311)
+    ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
 
     # Plot the CSD
 
@@ -57,51 +52,52 @@ def main():
     pp.calculate_gradient(ms.xvals, ms.yvals)
     found_peaks = pp.find_peaks(1)
 
-    fig = plt.figure(figsize=(12, 8))
-    ax = plt.subplot(111)
-    ms.plot_simulated_spectrum_simple(ax, color=tableau20[6])
+    # #fig = plt.figure(figsize=(12, 8))
+    # ax2 = plt.subplot(312)
+    # ms.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
+    # for peak in found_peaks:
+    #     peak.plotSimulatedPeak(ax2,
+    #                            ms.xvals,
+    #                            fwhm=simul_peak_fwhh,
+    #                            color=tableau20[5])
+
+    # plt.show()
+    # #plotly_fig = tls.mpl_to_plotly(fig)
+
+
+    #fig = plt.figure(figsize=(12, 8))
+    ax4 = plt.subplot(312)
+    ax3 = plt.subplot(313)
+    ms.plot_simulated_spectrum_simple(ax4, color=tableau20[0])
     for peak in found_peaks:
-        peak.plotSimulatedPeak(ax,
+        peak.plotSimulatedPeak(ax4,
                                ms.xvals,
                                fwhm=simul_peak_fwhh,
-                               color=tableau20[5])
+                               color=tableau20[2])
 
+    peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
+#    peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
+
+    ms.csds = []
+    for count, peak_set in enumerate(peaks_for_csds):
+        CSD1 = MsCSD()
+        CSD1.name = 'CSD' + str(count)
+        CSD1.p_fwhh = simul_peak_fwhh
+        CSD1_peak_indexes = peak_set
+        indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
+        CSD1.mspeaks = indexed_peaks
+        CSD1.calculateMassAndCharges(CSD1.mspeaks)
+        CSD1.optimiseParameters()
+        CSD1.estimateCharges(5)
+        CSD1.plot_residuals_per_peak(ax3,
+                                     CSD1.mspeaks,
+                                     marker='x',
+                                     color=tableau20[count])
+        ms.csds.append(CSD1)
+
+    plt.plot()
     plt.show()
-    #plotly_fig = tls.mpl_to_plotly(fig)
 
-
-#     fig = plt.figure(figsize=(12, 8))
-#     ax = plt.subplot(212)
-#     ax2 = plt.subplot(211)
-#     ms.plot_simulated_spectrum_simple(ax2, color=tableau20[0])
-#     for peak in found_peaks:
-#         peak.plotSimulatedPeak(ax2,
-#                                ms.xvals,
-#                                fwhm=simul_peak_fwhh,
-#                                color=tableau20[2])
-
-# #   peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
-#     peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
-
-#     ms.csds = []
-#     for count, peak_set in enumerate(peaks_for_csds):
-#         CSD1 = MsCSD()
-#         CSD1.name = 'CSD' + str(count)
-#         CSD1.p_fwhh = simul_peak_fwhh
-#         CSD1_peak_indexes = peak_set
-#         indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
-#         CSD1.mspeaks = indexed_peaks
-#         CSD1.calculateMassAndCharges(CSD1.mspeaks)
-#         CSD1.optimiseParameters()
-#         CSD1.estimateCharges(5)
-#         CSD1.plot_residuals_per_peak(ax,
-#                                      CSD1.mspeaks,
-#                                      marker='x',
-#                                      color=tableau20[count])
-#         ms.csds.append(CSD1)
-
-#     #plt.plot()
-#     #plt.show()
 #     #plotly_fig = tls.mpl_to_plotly( fig )
 #     #iplot(plotly_fig)
 
