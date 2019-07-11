@@ -28,8 +28,6 @@ function createWindow() {
 
 }
 
-
-
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
