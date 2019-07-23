@@ -27,7 +27,7 @@ simul_peak_fwhh = 75
 filename = "data/degQMSMS-chargeStripped.txt"
 
 
-def plot_atd(filename):
+def plot_atd(filename, grain_param, poly_order_param, smoothes_param, window_len_param):
     """ Plot the Arrival Time Distribution (ATD)
 
     Args:
@@ -55,7 +55,7 @@ def plot_atd(filename):
     return ms
 
 
-def plot_pp_csd(msObject, ):
+def plot_pp_csd(ms, simul_peak_fwhh):
     pp = PeakPicking()
     pp.calculate_gradient(ms.xvals, ms.yvals)
     found_peaks = pp.find_peaks(1)
@@ -100,7 +100,6 @@ def plot_pp_csd(msObject, ):
 
     plt.plot()
     # rplt.show()
-
 
 app.layout = html.Div(
     [
