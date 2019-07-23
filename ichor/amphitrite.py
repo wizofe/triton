@@ -4,7 +4,7 @@ from ichorlib.msClasses.MsCSD import MsCSD
 from ichorlib.genClasses.colorPalette import tableau20
 import matplotlib.pyplot as plt, mpld3
 
-#from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplotN
+# from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplotN
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -23,6 +23,9 @@ smoothes_param = 2
 window_len_param = 10
 simul_peak_fwhh = 75
 
+# Main data file
+filename = "data/degQMSMS-chargeStripped.txt"
+
 
 def plot_atd(filename):
     """ Plot the Arrival Time Distribution (ATD)
@@ -33,94 +36,93 @@ def plot_atd(filename):
     Returns:
     It shows a plot. TODO: Return a matplotlib/plotly/JSON object
     """
-    return
+    # Plot the ATD
+    ms = MassSpectrum()
+    ms.read_text_file(filename, grain=grain_param, normalisationtype="bpi")
+    ms.smoothingSG(
+        poly_order=poly_order_param,
+        smoothes=smoothes_param,
+        window_len=window_len_param,
+    )
+    ms.normalisation_bpi()
+    # ms.select_ms_range(4200,9000)
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot(311)
+    ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
+    plt.plot()
+
+    return ms
 
 
-# Main data file
-filename = 'data/degQMSMS-chargeStripped.txt'
+def plot_pp_csd(msObject, ):
+    pp = PeakPicking()
+    pp.calculate_gradient(ms.xvals, ms.yvals)
+    found_peaks = pp.find_peaks(1)
 
-# Plot the ATD
-ms = MassSpectrum()
-ms.read_text_file(filename, grain=grain_param, normalisationtype='bpi')
-ms.smoothingSG(poly_order=poly_order_param,
-                smoothes=smoothes_param,
-                window_len=window_len_param)
-ms.normalisation_bpi()
-#ms.select_ms_range(4200,9000)
+    # #fig = plt.figure(figsize=(12, 8))
+    # ax2 = plt.subplot(312)
+    # ms.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
+    # for peak in found_peaks:
+    #     peak.plotSimulatedPeak(ax2,
+    #                            ms.xvals,
+    #                            fwhm=simul_peak_fwhh,
+    #                            color=tableau20[5])
 
-fig = plt.figure(figsize=(12, 8))
-ax = plt.subplot(311)
-ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
+    # plt.show()
+    # #plotly_fig = tls.mpl_to_plotly(fig)
 
-# Plot the CSD
+    # fig = plt.figure(figsize=(12, 8))
+    ax4 = plt.subplot(312)
+    ax3 = plt.subplot(313)
+    ms.plot_simulated_spectrum_simple(ax4, color=tableau20[0])
+    for peak in found_peaks:
+        peak.plotSimulatedPeak(ax4, ms.xvals, fwhm=simul_peak_fwhh, color=tableau20[2])
 
-pp = PeakPicking()
-pp.calculate_gradient(ms.xvals, ms.yvals)
-found_peaks = pp.find_peaks(1)
+    peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
+    #    peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
 
-# #fig = plt.figure(figsize=(12, 8))
-# ax2 = plt.subplot(312)
-# ms.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
-# for peak in found_peaks:
-#     peak.plotSimulatedPeak(ax2,
-#                            ms.xvals,
-#                            fwhm=simul_peak_fwhh,
-#                            color=tableau20[5])
+    ms.csds = []
+    for count, peak_set in enumerate(peaks_for_csds):
+        CSD1 = MsCSD()
+        CSD1.name = "CSD" + str(count)
+        CSD1.p_fwhh = simul_peak_fwhh
+        CSD1_peak_indexes = peak_set
+        indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
+        CSD1.mspeaks = indexed_peaks
+        CSD1.calculateMassAndCharges(CSD1.mspeaks)
+        CSD1.optimiseParameters()
+        CSD1.estimateCharges(5)
+        CSD1.plot_residuals_per_peak(
+            ax3, CSD1.mspeaks, marker="x", color=tableau20[count]
+        )
+        ms.csds.append(CSD1)
 
-# plt.show()
-# #plotly_fig = tls.mpl_to_plotly(fig)
+    plt.plot()
+    # rplt.show()
 
 
-#fig = plt.figure(figsize=(12, 8))
-ax4 = plt.subplot(312)
-ax3 = plt.subplot(313)
-ms.plot_simulated_spectrum_simple(ax4, color=tableau20[0])
-for peak in found_peaks:
-    peak.plotSimulatedPeak(ax4,
-                            ms.xvals,
-                            fwhm=simul_peak_fwhh,
-                            color=tableau20[2])
-
-peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
-#    peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
-
-ms.csds = []
-for count, peak_set in enumerate(peaks_for_csds):
-    CSD1 = MsCSD()
-    CSD1.name = 'CSD' + str(count)
-    CSD1.p_fwhh = simul_peak_fwhh
-    CSD1_peak_indexes = peak_set
-    indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
-    CSD1.mspeaks = indexed_peaks
-    CSD1.calculateMassAndCharges(CSD1.mspeaks)
-    CSD1.optimiseParameters()
-    CSD1.estimateCharges(5)
-    CSD1.plot_residuals_per_peak(ax3,
-                                    CSD1.mspeaks,
-                                    marker='x',
-                                    color=tableau20[count])
-    ms.csds.append(CSD1)
-
-plt.plot()
-#rplt.show()
-
-app.layout = html.Div([
-    dcc.Upload([
-        'Drag and drop or ',
-        html.A('Select a file')
-    ], style={
-        'width': '100%',
-        'height': '60px',
-        'lineHeight': '60px',
-        'borderWidth': '1px',
-        'borderStyle': 'dashed',
-        'borderRadius': '5px',
-        'textAlign': 'center'
-     }),
-    #dcc.Graph( id = "heatmap", figure = go.Figure( data = [go.Heatmap(z=[[1, 20, 30], [20, 1, 60], [30, 60, 1]])] ) ),
-    dcc.Graph(id='visitors1', figure = go.Figure(tls.mpl_to_plotly(fig)))
-])
-
+app.layout = html.Div(
+    [
+        dcc.Upload(
+            ["Drag and drop or ", html.A("Select a file")],
+            style={
+                "width": "100%",
+                "height": "60px",
+                "lineHeight": "60px",
+                "borderWidth": "1px",
+                "borderStyle": "dashed",
+                "borderRadius": "5px",
+                "textAlign": "center",
+            },
+        ),
+        # dcc.Graph( id = "heatmap", figure = go.Figure( data = [go.Heatmap(z=[[1, 20, 30], [20, 1, 60], [30, 60, 1]])] ) ),
+        # dcc.Graph(id='visitors1', figure = go.Figure(tls.mpl_to_plotly(fig)))
+        dcc.Graph(
+            id="visitors1", figure=go.Figure(tls.mpl_to_plotly(plot_atd(filename)))
+        ),
+    ]
+)
 
 #     #plotly_fig = tls.mpl_to_plotly( fig )
 #     #iplot(plotly_fig)
