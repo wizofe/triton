@@ -27,7 +27,13 @@ simul_peak_fwhh = 75
 filename = "data/degQMSMS-chargeStripped.txt"
 
 
-def plot_atd(filename, grain=grain_param, poly_order=poly_order_param, smoothes=smoothes_param, window_len=window_len_param):
+def plot_atd(
+    filename,
+    grain=grain_param,
+    poly_order=poly_order_param,
+    smoothes=smoothes_param,
+    window_len=window_len_param,
+):
     """ Plot the Arrival Time Distribution (ATD)
 
     Args:
