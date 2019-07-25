@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
 from ichorlib.msClasses.MsCSD import MsCSD
@@ -24,7 +26,7 @@ window_len_param = 10
 simul_peak_fwhh = 75
 
 # Main data file
-filename = "data/degQMSMS-chargeStripped.txt"
+# filename = "data/degQMSMS-chargeStripped.txt"
 
 
 def plot_atd(
@@ -111,7 +113,8 @@ def plot_pp_csd(ms, simul_peak_fwhh):
 app.layout = html.Div(
     [
         dcc.Upload(
-            ["Drag and drop or ", html.A("Select a file")],
+            id="upload-data",
+            children=["Drag and drop or ", html.A("Select a file")],
             style={
                 "width": "100%",
                 "height": "60px",
@@ -124,11 +127,25 @@ app.layout = html.Div(
         ),
         # dcc.Graph( id = "heatmap", figure = go.Figure( data = [go.Heatmap(z=[[1, 20, 30], [20, 1, 60], [30, 60, 1]])] ) ),
         # dcc.Graph(id='visitors1', figure = go.Figure(tls.mpl_to_plotly(fig)))
-        dcc.Graph(
-            id="visitors1", figure=go.Figure(tls.mpl_to_plotly(plot_atd(filename)))
-        ),
+        dcc.Graph(id="adt-graph"),
     ]
 )
+
+
+@app.callback(
+    dash.dependencies.Output("adt-graph", "figure"),
+    [dash.dependencies.Input("upload-data", "filename")],
+)
+def update_adt_graph(filename):
+    if filename:
+        f = Path(filename).absolute()
+        open(f, 'r')
+        print(f.read())
+        figure = go.Figure(tls.mpl_to_plotly(plot_atd(filename)))
+    else:
+        figure = ""
+    return figure
+
 
 #     #plotly_fig = tls.mpl_to_plotly( fig )
 #     #iplot(plotly_fig)
