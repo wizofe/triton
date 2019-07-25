@@ -28,6 +28,10 @@ simul_peak_fwhh = 75
 # Main data file
 # filename = "data/degQMSMS-chargeStripped.txt"
 
+def parse_contents(contents):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    return pd.read_csv(io.StringIO(decoded.decode('utf-8')))
 
 def plot_atd(
     f,
@@ -136,9 +140,10 @@ app.layout = html.Div(
     dash.dependencies.Output("adt-graph", "figure"),
     [dash.dependencies.Input("upload-data", "filename")],
 )
-def update_adt_graph(filename):
-    if filename:
-        figure = go.Figure(tls.mpl_to_plotly(plot_atd(filename)))
+def update_adt_graph(data_file):
+    if data_file is not None:
+        print(parse_contents(data_file))
+        figure = go.Figure(tls.mpl_to_plotly(plot_atd(data_file)))
     else:
         figure = ""
     return figure
