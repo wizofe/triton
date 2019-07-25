@@ -30,7 +30,7 @@ simul_peak_fwhh = 75
 
 
 def plot_atd(
-    filename,
+    f,
     grain=grain_param,
     poly_order=poly_order_param,
     smoothes=smoothes_param,
@@ -39,14 +39,14 @@ def plot_atd(
     """ Plot the Arrival Time Distribution (ATD)
 
     Args:
-    filename (path): The filename with the data (tab delim. CSV)
+    f (path): The f with the data (tab delim. CSV)
 
     Returns:
     It shows a plot. TODO: Return a matplotlib/plotly/JSON object
     """
     # Plot the ATD
     ms = MassSpectrum()
-    ms.read_text_file(filename, grain=grain_param, normalisationtype="bpi")
+    ms.read_text_file(f, grain=grain_param, normalisationtype="bpi")
     ms.smoothingSG(
         poly_order=poly_order_param,
         smoothes=smoothes_param,
@@ -60,7 +60,7 @@ def plot_atd(
     ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
     plt.plot()
 
-    return ms
+    return fig
 
 
 def plot_pp_csd(ms, simul_peak_fwhh):
@@ -138,9 +138,6 @@ app.layout = html.Div(
 )
 def update_adt_graph(filename):
     if filename:
-        f = Path(filename).absolute()
-        open(f, 'r')
-        print(f.read())
         figure = go.Figure(tls.mpl_to_plotly(plot_atd(filename)))
     else:
         figure = ""
