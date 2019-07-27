@@ -1,2 +1,3 @@
 @echo off
-py -3 ichor/amphitrite.py
+cd ichor
+python3 amphitrite.py
