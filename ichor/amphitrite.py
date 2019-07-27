@@ -1,6 +1,6 @@
 import base64
 import io
-from pathlib import Path
+import pathlib
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
@@ -31,10 +31,12 @@ simul_peak_fwhh = 75
 MYPATH = pathlib.Path(__file__).parent
 DATA_PATH = MYPATH.joinpath("data").resolve()
 
+
 def parse_contents(contents):
-    _, content_string = contents.split(',')
+    _, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
-    return io.StringIO(decoded.decode('utf-8'))
+    return io.StringIO(decoded.decode("utf-8"))
+
 
 def plot_atd(
     f,
@@ -119,20 +121,43 @@ def plot_pp_csd(ms, simul_peak_fwhh):
 
 app.layout = html.Div(
     [
-        dcc.Upload(
-            id="upload-data",
-            children=["Drag and drop or ", html.A("Select a file")],
-            style={
-                "width": "100%",
-                "height": "60px",
-                "lineHeight": "60px",
-                "borderWidth": "1px",
-                "borderStyle": "dashed",
-                "borderRadius": "5px",
-                "textAlign": "center",
-            },
-        ),
-        dcc.Graph(id="adt-graph"),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.Img(
+                            src=app.get_asset_url("icons/ThalassinosLogo.png"),
+                            id="thalassinos-logo",
+                            style={
+                                "height": "60px",
+                                "width": "auto",
+                                "margin-bottom": "25px",
+                            },
+                        )
+                    ],
+                    className="one-third-column",
+                ),
+                html.Div(
+                    [html.Div([html.H3("Triton: A native IMMS dashboard")])],
+                    className="one-half column",
+                    id="title",
+                ),
+                dcc.Upload(
+                    id="upload-data",
+                    children=["Drag and drop or ", html.A("Select a file")],
+                    style={
+                        "width": "100%",
+                        "height": "60px",
+                        "lineHeight": "60px",
+                        "borderWidth": "1px",
+                        "borderStyle": "dashed",
+                        "borderRadius": "5px",
+                        "textAlign": "center",
+                    },
+                ),
+                dcc.Graph(id="adt-graph"),
+            ]
+        )
     ]
 )
 
@@ -143,7 +168,7 @@ app.layout = html.Div(
 )
 def update_adt_graph(data_file):
     if data_file is not None:
-        figure = go.Figure(tls.mpl_to_plotly(plot_atd(DATA_PATH.joinpath(data_file), low_memory=False)))
+        figure = go.Figure(tls.mpl_to_plotly(plot_atd(DATA_PATH.joinpath(data_file))))
     else:
         figure = ""
     return figure
