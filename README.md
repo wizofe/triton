@@ -15,3 +15,5 @@ IPC Client Server Architecture with a Renderer/Main process and a Flask server t
 A virtual environment can be created in order to run the program but it's main structure is quite simple:
 
 Run the `python3 ichor/amphitrite.py` to create a server process that will provide a local server on a predefined port (5000 by default but that can be changed). When this is sucesfull the Electron part of the application can be started by running `electron .` which will install the respective `node_modules` and run the front-end.
+
+Note: You need to save the data files inside `ichor/data` folder for the front-end to properly operate. This is going to be changed in future versions.
