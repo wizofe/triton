@@ -119,3 +119,4 @@ venv.bak/
 
 # mscThesis VirtualEnv
 mscThesis/*
+.vscode/settings.json
