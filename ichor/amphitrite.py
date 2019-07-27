@@ -1,3 +1,5 @@
+import base64
+import io
 from pathlib import Path
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
@@ -25,13 +27,14 @@ smoothes_param = 2
 window_len_param = 10
 simul_peak_fwhh = 75
 
-# Main data file
-# filename = "data/degQMSMS-chargeStripped.txt"
+# Set the relative data path
+MYPATH = pathlib.Path(__file__).parent
+DATA_PATH = MYPATH.joinpath("data").resolve()
 
 def parse_contents(contents):
-    content_type, content_string = contents.split(',')
+    _, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
-    return pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+    return io.StringIO(decoded.decode('utf-8'))
 
 def plot_atd(
     f,
@@ -140,7 +143,7 @@ app.layout = html.Div(
 )
 def update_adt_graph(data_file):
     if data_file is not None:
-        figure = go.Figure(tls.mpl_to_plotly(plot_atd(data_file)))
+        figure = go.Figure(tls.mpl_to_plotly(plot_atd(DATA_PATH.joinpath(data_file), low_memory=False)))
     else:
         figure = ""
     return figure
