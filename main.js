@@ -1,5 +1,5 @@
 // Main electron entrance point
-// It is connected to the Flask server
+// A connection to the Flask server through the main window is created
 // in the localhost:5000 port (that can be changed on amphitrite.py) 
 
 const {
