@@ -18,7 +18,7 @@ import plotly.tools as tls
 import plotly.graph_objs as go
 import json
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
+external_stylesheets = ["https://code.getmdl.io/1.3.0/material.min.js"]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 grain_param = 10
@@ -135,30 +135,38 @@ app.layout = html.Div(
                             },
                         )
                     ],
-                    className="one-third-column",
+                    className="one-third column",
                 ),
                 html.Div(
-                    [html.Div([html.H3("Triton: A native IMMS dashboard")])],
+                    [
+                        html.Div(
+                            [
+                                html.H3("Triton", style={"margin-bottom": "0px"}),
+                                html.H5(
+                                    "A native IMMS dashboard",
+                                    style={"margin-top": "0px"},
+                                ),
+                            ]
+                        )
+                    ],
                     className="one-half column",
                     id="title",
                 ),
-                dcc.Upload(
-                    id="upload-data",
-                    children=["Drag and drop or ", html.A("Select a file")],
-                    style={
-                        "width": "100%",
-                        "height": "60px",
-                        "lineHeight": "60px",
-                        "borderWidth": "1px",
-                        "borderStyle": "dashed",
-                        "borderRadius": "5px",
-                        "textAlign": "center",
-                    },
+                html.Div(
+                    [dcc.Upload(id="upload-data", children=html.Button("Upload Data"))],
+                    className="one-third column",
                 ),
-                dcc.Graph(id="adt-graph"),
-            ]
-        )
-    ]
+            ],
+            id="header",
+            className="row flex-display",
+            style={"margin-bottom": "25px"},
+        ),
+        html.Div(
+            [html.Div([dcc.Graph(id="adt-graph")], className="row flex-display")],
+            className="row flex-display",
+        ),
+    ],
+    style={"display": "flex", "flex-direction": "column"},
 )
 
 
