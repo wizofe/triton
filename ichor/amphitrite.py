@@ -129,8 +129,6 @@ app.layout = html.Div(
                 "textAlign": "center",
             },
         ),
-        # dcc.Graph( id = "heatmap", figure = go.Figure( data = [go.Heatmap(z=[[1, 20, 30], [20, 1, 60], [30, 60, 1]])] ) ),
-        # dcc.Graph(id='visitors1', figure = go.Figure(tls.mpl_to_plotly(fig)))
         dcc.Graph(id="adt-graph"),
     ]
 )
@@ -142,7 +140,6 @@ app.layout = html.Div(
 )
 def update_adt_graph(data_file):
     if data_file is not None:
-        print(parse_contents(data_file))
         figure = go.Figure(tls.mpl_to_plotly(plot_atd(data_file)))
     else:
         figure = ""
