@@ -163,10 +163,17 @@ body = dbc.Container(
                         dcc.Upload(
                             id="upload-data", children=dbc.Button("Upload Data")
                         ),
-                    ],
-                    md=4,
-                ),
-                dbc.Col([html.H2("ADT"), dcc.Graph(id="adt-graph")]),
+                    ]
+                )
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Col([html.H2("ADT"), dcc.Graph(id="adt-graph")]),
+                    ]
+                )
             ]
         ),
         dbc.Row(
@@ -176,7 +183,8 @@ body = dbc.Container(
             ]
         ),
         dbc.Row(dbc.Col([html.H2("Here goes the CIU")])),
-    ]
+    ],
+    className="md-4"
 )
 
 app.layout = html.Div([navbar, body])
