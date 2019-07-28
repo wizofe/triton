@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt, mpld3
 # from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplotN
 import dash
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 
 import plotly.plotly as py
@@ -18,8 +19,7 @@ import plotly.tools as tls
 import plotly.graph_objs as go
 import json
 
-external_stylesheets = ["https://code.getmdl.io/1.3.0/material.min.js"]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 
 grain_param = 10
 poly_order_param = 5
@@ -67,7 +67,7 @@ def plot_atd(
     fig = plt.figure(figsize=(12, 8))
     ax = plt.subplot(311)
     ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
-    plt.plot()
+    # plt.plot()
 
     return fig
 
@@ -119,55 +119,67 @@ def plot_pp_csd(ms, simul_peak_fwhh):
     # rplt.show()
 
 
-app.layout = html.Div(
+logo = "assets/ThalassinosLogo.png"
+encoded_logo = base64.b64encode(open(logo, "rb").read())
+
+navbar = dbc.Navbar(
     [
-        html.Div(
-            [
-                html.Div(
-                    [
+        html.A(
+            dbc.Row(
+                [
+                    dbc.Col(
                         html.Img(
-                            src=app.get_asset_url("icons/ThalassinosLogo.png"),
-                            id="thalassinos-logo",
-                            style={
-                                "height": "60px",
-                                "width": "auto",
-                                "margin-bottom": "25px",
-                            },
+                            src="data:image/png;base64,{}".format(
+                                encoded_logo.decode()
+                            ),
+                            height="20px",
                         )
-                    ],
-                    className="one-third column",
-                ),
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.H3("Triton", style={"margin-bottom": "0px"}),
-                                html.H5(
-                                    "A native IMMS dashboard",
-                                    style={"margin-top": "0px"},
-                                ),
-                            ]
+                    ),
+                    dbc.Col(
+                        dbc.NavbarBrand(
+                            "Triton: A web dashboard for native IMMS data",
+                            className="navbar-brand",
                         )
-                    ],
-                    className="one-half column",
-                    id="title",
-                ),
-                html.Div(
-                    [dcc.Upload(id="upload-data", children=html.Button("Upload Data"))],
-                    className="one-third column",
-                ),
-            ],
-            id="header",
-            className="row flex-display",
-            style={"margin-bottom": "25px"},
-        ),
-        html.Div(
-            [html.Div([dcc.Graph(id="adt-graph")], className="row flex-display")],
-            className="row flex-display",
-        ),
+                    ),
+                ],
+                align="center",
+                justify="between",
+                no_gutters=True,
+            ),
+            href="/",
+        )
     ],
-    style={"display": "flex", "flex-direction": "column"},
+    color="light",
+    dark=False,
 )
+
+body = dbc.Container(
+    [
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.H2("Here goes the data settings"),
+                        dcc.Upload(
+                            id="upload-data", children=dbc.Button("Upload Data")
+                        ),
+                    ],
+                    md=4,
+                ),
+                dbc.Col([html.H2("ADT"), dcc.Graph(id="adt-graph")]),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col([html.H2("Here goes the CDT")], md=6),
+                dbc.Col([html.H2("Here goes the fitting")]),
+            ]
+        ),
+        dbc.Row(dbc.Col([html.H2("Here goes the CIU")])),
+    ]
+)
+
+app.layout = html.Div([navbar, body])
 
 
 @app.callback(
@@ -263,4 +275,5 @@ def update_adt_graph(data_file):
 #     # plt.plot()
 
 if __name__ == "__main__":
+    app.debug = True
     app.run_server(debug=False, host="127.0.0.1", port=5000)
