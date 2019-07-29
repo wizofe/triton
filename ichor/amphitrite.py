@@ -1,12 +1,10 @@
 import base64
-import io
 import pathlib
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
 from ichorlib.msClasses.MsCSD import MsCSD
 from ichorlib.genClasses.colorPalette import tableau20
-import matplotlib.pyplot as plt, mpld3
 
 # from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplotN
 import dash
@@ -19,12 +17,20 @@ import plotly.tools as tls
 import plotly.graph_objs as go
 import json
 
+
+# From SO: https://stackoverflow.com/a/29172195/8088718
+# Avoid the tk gui bug
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt, mpld3
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 
 grain_param = 10
 poly_order_param = 5
 smoothes_param = 2
-window_len_param = 10
+window_len_param = 1000
 simul_peak_fwhh = 75
 
 # Set the relative data path
@@ -32,18 +38,12 @@ MYPATH = pathlib.Path(__file__).parent
 DATA_PATH = MYPATH.joinpath("data").resolve()
 
 
-def parse_contents(contents):
-    _, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
-    return io.StringIO(decoded.decode("utf-8"))
-
-
 def plot_atd(
     f,
-    grain=grain_param,
-    poly_order=poly_order_param,
-    smoothes=smoothes_param,
-    window_len=window_len_param,
+    my_grain,
+    my_poly_order,
+    my_smoothes,
+    my_window_len,
 ):
     """ Plot the Arrival Time Distribution (ATD)
 
@@ -55,11 +55,11 @@ def plot_atd(
     """
     # Plot the ATD
     ms = MassSpectrum()
-    ms.read_text_file(f, grain=grain_param, normalisationtype="bpi")
+    ms.read_text_file(f, 0, my_grain, normalisationtype="bpi")
     ms.smoothingSG(
-        poly_order=poly_order_param,
-        smoothes=smoothes_param,
-        window_len=window_len_param,
+        my_window_len,
+        my_smoothes,
+        my_poly_order,
     )
     ms.normalisation_bpi()
     # ms.select_ms_range(4200,9000)
@@ -68,7 +68,6 @@ def plot_atd(
     ax = plt.subplot(311)
     ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
     # plt.plot()
-
     return fig
 
 
@@ -119,6 +118,7 @@ def plot_pp_csd(ms, simul_peak_fwhh):
     # rplt.show()
 
 
+# Navigation bar and logo
 logo = "assets/ThalassinosLogo.png"
 encoded_logo = base64.b64encode(open(logo, "rb").read())
 
@@ -153,53 +153,99 @@ navbar = dbc.Navbar(
     dark=False,
 )
 
-body = dbc.Container(
+# Content definitions
+card_content_settings = [
+    dbc.CardHeader("Choose your settings"),
+    dbc.CardBody(
+        [
+            dcc.Upload(
+                id="upload-data",
+                children=dbc.Button("Upload Data", color="primary", className="mr-1"),
+            ),
+            html.Label("Select grain:"),
+            dcc.Slider(
+                id="grain-slider",
+                min=0,
+                max=20,
+                value=10,
+                marks={0: "0", 2: "2", 20: "20"},
+            ),
+            html.Label("Select the order of the poly:"),
+            dcc.Slider(
+                id="poly-order-slider",
+                min=0,
+                max=30,
+                value=5,
+                marks={0: "0", 5: "5", 30: "30"},
+            ),
+            html.Label("Select the smooth parameter:"),
+            dcc.Slider(
+                id="smoothes-slider",
+                min=0,
+                max=50,
+                value=2,
+                marks={0: "0", 2: "2", 50: "50"},
+            ),
+            html.Label("Select the window length:"),
+            dcc.Slider(
+                id="windowlen-slider",
+                min=0,
+                max=5000,
+                value=10,
+                marks={0: "0", 10: "10", 500: "500"},
+            ),
+        ]
+    ),
+]
+
+adt_content_settings = [
+    dbc.CardHeader("ADT Plot"),
+    dbc.CardBody([dcc.Graph(id="adt-graph")]),
+]
+
+input_data_raw = dbc.Row(
     [
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        html.H2("Here goes the data settings"),
-                        dcc.Upload(
-                            id="upload-data", children=dbc.Button("Upload Data")
-                        ),
-                    ]
-                )
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.Col([html.H2("ADT"), dcc.Graph(id="adt-graph")]),
-                    ]
-                )
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col([html.H2("Here goes the CDT")], md=6),
-                dbc.Col([html.H2("Here goes the fitting")]),
-            ]
-        ),
-        dbc.Row(dbc.Col([html.H2("Here goes the CIU")])),
-    ],
-    className="md-4"
+        dbc.Col(dbc.Card(card_content_settings, outline=True), md=3),
+        dbc.Col(dbc.Card(adt_content_settings), md=9),
+    ]
+    # className="mb-4"
 )
 
+# input_adt = dbc.Row([dbc.Col(dbc.Card(adt_content_settings))])
+
+body = html.Div(
+    [input_data_raw],
+    style={"marginBottom": 50, "marginTop": 25, "text-align": "center"},
+)
+
+app.config["suppress_callback_exceptions"] = False
 app.layout = html.Div([navbar, body])
 
 
 @app.callback(
     dash.dependencies.Output("adt-graph", "figure"),
-    [dash.dependencies.Input("upload-data", "filename")],
+    [
+        dash.dependencies.Input("upload-data", "filename"),
+        dash.dependencies.Input("grain-slider", "value"),
+        dash.dependencies.Input("poly-order-slider", "value"),
+        dash.dependencies.Input("smoothes-slider", "value"),
+        dash.dependencies.Input("windowlen-slider", "value"),
+    ],
 )
-def update_adt_graph(data_file):
-    if data_file is not None:
-        figure = go.Figure(tls.mpl_to_plotly(plot_atd(DATA_PATH.joinpath(data_file))))
-    else:
-        figure = ""
-    return figure
+def update_adt_graph(
+    data_file, grain_value, poly_order_value, smoothes_value, windowlen_value
+):
+    return go.Figure(
+        tls.mpl_to_plotly(
+            plot_atd(
+                DATA_PATH.joinpath(data_file),
+                grain_value,
+                poly_order_value,
+                smoothes_value,
+                windowlen_value
+            )
+        )
+    )
 
 
 #     #plotly_fig = tls.mpl_to_plotly( fig )
