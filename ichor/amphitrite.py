@@ -1,5 +1,7 @@
 import base64
 import pathlib
+import json
+import cProfile
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
@@ -15,14 +17,13 @@ import dash_html_components as html
 import plotly.plotly as py
 import plotly.tools as tls
 import plotly.graph_objs as go
-import json
 
 
 # From SO: https://stackoverflow.com/a/29172195/8088718
 # Avoid the tk gui bug
-import matplotlib
+# import matplotlib
 
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 import matplotlib.pyplot as plt, mpld3
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
@@ -38,13 +39,21 @@ MYPATH = pathlib.Path(__file__).parent
 DATA_PATH = MYPATH.joinpath("data").resolve()
 
 
-def plot_atd(
-    f,
-    my_grain,
-    my_poly_order,
-    my_smoothes,
-    my_window_len,
-):
+def do_cprofile(func):
+    def profiled_func(*args, **kwargs):
+        profile = cProfile.Profile()
+        try:
+            profile.enable()
+            result = func(*args, **kwargs)
+            profile.disable()
+            return result
+        finally:
+            profile.print_stats()
+
+    return profiled_func
+
+
+def plot_atd(f, my_grain, my_poly_order, my_smoothes, my_window_len):
     """ Plot the Arrival Time Distribution (ATD)
 
     Args:
@@ -56,66 +65,61 @@ def plot_atd(
     # Plot the ATD
     ms = MassSpectrum()
     ms.read_text_file(f, 0, my_grain, normalisationtype="bpi")
-    ms.smoothingSG(
-        my_window_len,
-        my_smoothes,
-        my_poly_order,
-    )
+    ms.smoothingSG(my_window_len, my_smoothes, my_poly_order)
     ms.normalisation_bpi()
     # ms.select_ms_range(4200,9000)
 
-    fig = plt.figure(figsize=(12, 8))
-    ax = plt.subplot(311)
+    # fig = plt.figure(figsize=(12, 8)
+    # ax = plt.subplot(311)
+    fig, ax = plt.subplots()
     ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
-    # plt.plot()
-    return fig
+    return fig, ms
 
 
-def plot_pp_csd(ms, simul_peak_fwhh):
+@do_cprofile
+def plot_pp_csd(my_simul_peak, msobj):
     pp = PeakPicking()
-    pp.calculate_gradient(ms.xvals, ms.yvals)
+    pp.calculate_gradient(msobj.xvals, msobj.yvals)
     found_peaks = pp.find_peaks(1)
 
-    # #fig = plt.figure(figsize=(12, 8))
+    # fig = plt.figure(figsize=(12, 8))
     # ax2 = plt.subplot(312)
-    # ms.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
-    # for peak in found_peaks:
-    #     peak.plotSimulatedPeak(ax2,
-    #                            ms.xvals,
-    #                            fwhm=simul_peak_fwhh,
-    #                            color=tableau20[5])
+    fig, ax2 = plt.subplots()
+    msobj.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
+    for peak in found_peaks:
+        peak.plotSimulatedPeak(ax2, msobj.xvals, fwhm=my_simul_peak, color=tableau20[5])
 
     # plt.show()
-    # #plotly_fig = tls.mpl_to_plotly(fig)
+    return fig
 
-    # fig = plt.figure(figsize=(12, 8))
-    ax4 = plt.subplot(312)
-    ax3 = plt.subplot(313)
-    ms.plot_simulated_spectrum_simple(ax4, color=tableau20[0])
-    for peak in found_peaks:
-        peak.plotSimulatedPeak(ax4, ms.xvals, fwhm=simul_peak_fwhh, color=tableau20[2])
+    # fig = plt.figure() # figsize=(12, 8))
+    # ax4 = plt.subplot(312)
+    # ax3 = plt.subplot(313)
+    # ms.plot_simulated_spectrum_simple(ax4, color=tableau20[0])
+    # for peak in found_peaks:
+    #     peak.plotSimulatedPeak(ax4, ms.xvals, fwhm=simul_peak_fwhh, color=tableau20[2])
 
-    peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
-    #    peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
+    # peaks_for_csds = [[32, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
+    # #    peaks_for_csds = [[12, 36, 42, 48, 54], [38, 45, 50], [28, 33, 41]]
 
-    ms.csds = []
-    for count, peak_set in enumerate(peaks_for_csds):
-        CSD1 = MsCSD()
-        CSD1.name = "CSD" + str(count)
-        CSD1.p_fwhh = simul_peak_fwhh
-        CSD1_peak_indexes = peak_set
-        indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
-        CSD1.mspeaks = indexed_peaks
-        CSD1.calculateMassAndCharges(CSD1.mspeaks)
-        CSD1.optimiseParameters()
-        CSD1.estimateCharges(5)
-        CSD1.plot_residuals_per_peak(
-            ax3, CSD1.mspeaks, marker="x", color=tableau20[count]
-        )
-        ms.csds.append(CSD1)
+    # ms.csds = []
+    # for count, peak_set in enumerate(peaks_for_csds):
+    #     CSD1 = MsCSD()
+    #     CSD1.name = "CSD" + str(count)
+    #     CSD1.p_fwhh = simul_peak_fwhh
+    #     CSD1_peak_indexes = peak_set
+    #     indexed_peaks = pp.get_peaks_using_indexes(CSD1_peak_indexes)
+    #     CSD1.mspeaks = indexed_peaks
+    #     CSD1.calculateMassAndCharges(CSD1.mspeaks)
+    #     CSD1.optimiseParameters()
+    #     CSD1.estimateCharges(5)
+    #     CSD1.plot_residuals_per_peak(
+    #         ax3, CSD1.mspeaks, marker="x", color=tableau20[count]
+    #     )
+    #     ms.csds.append(CSD1)
 
-    plt.plot()
-    # rplt.show()
+    # plt.plot()
+    # # rplt.show()
 
 
 # Navigation bar and logo
@@ -164,35 +168,35 @@ card_content_settings = [
             ),
             html.Label("Select grain:"),
             dcc.Slider(
-                id="grain-slider",
-                min=0,
-                max=20,
-                value=10,
-                marks={0: "0", 2: "2", 20: "20"},
+                id="grain-slider", min=0, max=20, value=10, marks={0: "0", 20: "20"}
             ),
             html.Label("Select the order of the poly:"),
             dcc.Slider(
                 id="poly-order-slider",
                 min=0,
-                max=30,
+                max=10,
                 value=5,
-                marks={0: "0", 5: "5", 30: "30"},
+                marks={0: "0", 5: "5", 10: "10"},
             ),
             html.Label("Select the smooth parameter:"),
             dcc.Slider(
-                id="smoothes-slider",
-                min=0,
-                max=50,
-                value=2,
-                marks={0: "0", 2: "2", 50: "50"},
+                id="smoothes-slider", min=0, max=10, value=2, marks={0: "0", 10: "10"}
             ),
             html.Label("Select the window length:"),
             dcc.Slider(
                 id="windowlen-slider",
                 min=0,
-                max=5000,
+                max=100,
                 value=10,
-                marks={0: "0", 10: "10", 500: "500"},
+                marks={0: "0", 50: "50", 100: "100"},
+            ),
+            html.Label("Simulated peak:"),
+            dcc.Slider(
+                id="simulpeak-slider",
+                min=0,
+                max=120,
+                value=75,
+                marks={0: "0", 50: "50", 100: "100"},
             ),
         ]
     ),
@@ -203,15 +207,19 @@ adt_content_settings = [
     dbc.CardBody([dcc.Graph(id="adt-graph")]),
 ]
 
+csd_content_settings = [
+    dbc.CardHeader("CSD Plot"),
+    dbc.CardBody([dcc.Graph(id="csd-graph")]),
+]
+
 input_data_raw = dbc.Row(
     [
-        dbc.Col(dbc.Card(card_content_settings, outline=True), md=3),
-        dbc.Col(dbc.Card(adt_content_settings), md=9),
+        dbc.Col(dbc.Card(card_content_settings, outline=True), md=2),
+        dbc.Col(dbc.Card(adt_content_settings, outline=True), md=5),
+        dbc.Col(dbc.Card(csd_content_settings, outline=True), md=5),
     ]
     # className="mb-4"
 )
-
-# input_adt = dbc.Row([dbc.Col(dbc.Card(adt_content_settings))])
 
 body = html.Div(
     [input_data_raw],
@@ -223,30 +231,49 @@ app.layout = html.Div([navbar, body])
 
 
 @app.callback(
-    dash.dependencies.Output("adt-graph", "figure"),
+    [
+        dash.dependencies.Output("adt-graph", "figure"),
+        dash.dependencies.Output("csd-graph", "figure"),
+    ],
     [
         dash.dependencies.Input("upload-data", "filename"),
         dash.dependencies.Input("grain-slider", "value"),
         dash.dependencies.Input("poly-order-slider", "value"),
         dash.dependencies.Input("smoothes-slider", "value"),
         dash.dependencies.Input("windowlen-slider", "value"),
+        dash.dependencies.Input("simulpeak-slider", "value"),
     ],
 )
 def update_adt_graph(
-    data_file, grain_value, poly_order_value, smoothes_value, windowlen_value
+    data_file,
+    grain_value,
+    poly_order_value,
+    smoothes_value,
+    windowlen_value,
+    simulpeak_value,
 ):
-    return go.Figure(
-        tls.mpl_to_plotly(
-            plot_atd(
-                DATA_PATH.joinpath(data_file),
-                grain_value,
-                poly_order_value,
-                smoothes_value,
-                windowlen_value
-            )
-        )
+    atd, msobj = plot_atd(
+        DATA_PATH.joinpath(data_file),
+        grain_value,
+        poly_order_value,
+        smoothes_value,
+        windowlen_value,
+    )
+    return (
+        tls.mpl_to_plotly(atd),
+        go.Figure(tls.mpl_to_plotly(plot_pp_csd(simulpeak_value, msobj))),
     )
 
+
+# @app.callback(
+#     dash.dependencies.Output("csd-graph", "figure"),
+#     [
+
+#     ],
+# )
+# def update_csd_graph(simulpeak_value):
+
+#     return go.Figure(tls.mpl_to_plotly(plot_pp_csd(simulpeak_value, )))
 
 #     #plotly_fig = tls.mpl_to_plotly( fig )
 #     #iplot(plotly_fig)
