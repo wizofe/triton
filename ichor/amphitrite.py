@@ -2,6 +2,7 @@ import base64
 import pathlib
 import json
 import cProfile
+import logging
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
@@ -22,9 +23,14 @@ import plotly.graph_objs as go
 # From SO: https://stackoverflow.com/a/29172195/8088718
 # Avoid the tk gui bug
 # import matplotlib
-
 # matplotlib.use("Agg")
 import matplotlib.pyplot as plt, mpld3
+
+# Set logging level
+logging.basicConfig(filename="tritonDebug.log", level=logging.DEBUG)
+mpl_log = logging.getLogger("matplotlib")
+mpl_log.setLevel(logging.WARNING)
+
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 
@@ -48,23 +54,23 @@ def do_cprofile(func):
             profile.disable()
             return result
         finally:
-            profile.print_stats()
+            profile.dump_stats("stupidlySlow.prof")
 
     return profiled_func
 
 
-def plot_atd(f, my_grain, my_poly_order, my_smoothes, my_window_len):
+def plot_atd(my_data_file, my_grain, my_poly_order, my_smoothes, my_window_len):
     """ Plot the Arrival Time Distribution (ATD)
 
     Args:
-    f (path): The f with the data (tab delim. CSV)
+    my_data_file (path): The experimental data file named my_data_file (tab delim. CSV)
 
     Returns:
     It shows a plot. TODO: Return a matplotlib/plotly/JSON object
     """
     # Plot the ATD
     ms = MassSpectrum()
-    ms.read_text_file(f, 0, my_grain, normalisationtype="bpi")
+    ms.read_text_file(my_data_file, 0, my_grain, normalisationtype="bpi")
     ms.smoothingSG(my_window_len, my_smoothes, my_poly_order)
     ms.normalisation_bpi()
     # ms.select_ms_range(4200,9000)
@@ -73,6 +79,7 @@ def plot_atd(f, my_grain, my_poly_order, my_smoothes, my_window_len):
     # ax = plt.subplot(311)
     fig, ax = plt.subplots()
     ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
+    logging.debug(ms.__dict__)
     return fig, ms
 
 
