@@ -259,15 +259,16 @@ def update_adt_graph(
     windowlen_value,
     simulpeak_value,
 ):
-    atd, msobj = plot_atd(
-        DATA_PATH.joinpath(data_file),
-        grain_value,
-        poly_order_value,
-        smoothes_value,
-        windowlen_value,
-    )
+    if data_file is not None:
+        atd, msobj = plot_atd(
+            DATA_PATH.joinpath(data_file),
+            grain_value,
+            poly_order_value,
+            smoothes_value,
+            windowlen_value,
+        )
     return (
-        tls.mpl_to_plotly(atd),
+        go.Figure(tls.mpl_to_plotly(atd)),
         go.Figure(tls.mpl_to_plotly(plot_pp_csd(simulpeak_value, msobj))),
     )
 
@@ -363,5 +364,4 @@ def update_adt_graph(
 #     # plt.plot()
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run_server(debug=False, host="127.0.0.1", port=5000)
+    app.run_server(debug=False, host="127.0.0.1", port=5000, threaded=True)
