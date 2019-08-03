@@ -34,11 +34,11 @@ mpl_log.setLevel(logging.WARNING)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 
-grain_param = 10
-poly_order_param = 5
-smoothes_param = 2
-window_len_param = 1000
-simul_peak_fwhh = 75
+# grain_param = 10
+# poly_order_param = 5
+# smoothes_param = 2
+# window_len_param = 1000
+# simul_peak_fwhh = 75
 
 # Set the relative data path
 MYPATH = pathlib.Path(__file__).parent
