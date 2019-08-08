@@ -20,6 +20,11 @@ import plotly.offline as py
 import plotly.tools as tls
 import plotly.graph_objs as go
 
+from scipy.signal import find_peaks
+import numpy as np
+import pandas as pd
+import peakutils
+
 from flask_caching import Cache
 
 
@@ -82,7 +87,7 @@ def plot_atd(my_data_file, my_grain, my_poly_order, my_smoothes, my_window_len):
     # Plot the ATD
     ms = MassSpectrum()
     ms.read_text_file(my_data_file, 0, my_grain, normalisationtype="bpi")
-    
+
     ms.smoothingSG(my_window_len, my_smoothes, my_poly_order)
     ms.normalisation_bpi()
     # ms.select_ms_range(4200,9000)
@@ -93,13 +98,9 @@ def plot_atd(my_data_file, my_grain, my_poly_order, my_smoothes, my_window_len):
     # ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
     # logging.debug(ms.__dict__)
     fig = go.Figure()
-    fig.add_trace(go.Scattergl(
-        x = ms.xvals,
-        y = ms.yvals,
-        mode='lines',
-    ))
-    
-    return fig
+    fig.add_trace(go.Scattergl(x=ms.xvals, y=ms.yvals, mode="lines"))
+
+    return fig, ms
 
 
 # @do_cprofile
@@ -116,34 +117,21 @@ def plot_pp_csd(my_simul_peak, msobj):
     #     peak.plotSimulatedPeak(ax2, msobj.xvals, fwhm=my_simul_peak, color=tableau20[5])
 
     # plt.show()
-    from scipy.signal import find_peaks
-    from scipy.signal import argrelmax, argrelmin
-    import pprint
-    import numpy as np
-    import pandas as pd
-    import peakutils
 
-    indices, top = find_peaks(ms.yvals, prominence=1)
-    pprint.pprint(top)
+    indices, top = find_peaks(msobj.yvals, prominence=1)
 
     fig = go.Figure()
-    fig.add_trace(go.Scattergl(
-        y = ms.yvals,
-        mode = 'lines',
-        name = 'ATD+Peaks'
-    ))
+    fig.add_trace(go.Scattergl(y=msobj.yvals, mode="lines", name="ATD+Peaks"))
 
-    fig.add_trace(go.Scattergl(
-        x = indices,
-        y = [ms.yvals[j] for j in indices],
-        mode = 'markers',
-        marker = dict(
-            size = 8,
-            color = 'red',
-            symbol = 'cross'
-        ),
-        name = 'CCS Peaks'
-    ))
+    fig.add_trace(
+        go.Scattergl(
+            x=indices,
+            y=[msobj.yvals[j] for j in indices],
+            mode="markers",
+            marker=dict(size=8, color="red", symbol="cross"),
+            name="CCS Peaks",
+        )
+    )
 
     return fig
 
@@ -315,10 +303,7 @@ def update_adt_graph(
             smoothes_value,
             windowlen_value,
         )
-    return (
-        go.Figure(atd),
-        go.Figure(plot_pp_csd(simulpeak_value, msobj)),
-    )
+    return (go.Figure(atd), go.Figure(plot_pp_csd(simulpeak_value, msobj)))
 
 
 # @app.callback(
@@ -415,4 +400,4 @@ if __name__ == "__main__":
     # from werkzeug.contrib.profiler import ProfilerMiddleware
     # app.server.config['PROFILE'] = True
     # app.server.wsgi_app = ProfilerMiddleware(app.server.wsgi_app, restrictions=[30])
-    app.run_server(debug=False, host="127.0.0.1", port=5000, threaded=True)
+    app.run_server(debug=True, host="127.0.0.1", port=5000, threaded=True)
