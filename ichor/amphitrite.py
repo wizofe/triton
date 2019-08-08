@@ -3,6 +3,7 @@ import pathlib
 import json
 import cProfile
 import logging
+import os
 
 from ichorlib.msClasses.MassSpectrum import MassSpectrum
 from ichorlib.genClasses.PeakPicking import PeakPicking
@@ -15,15 +16,18 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
-import plotly.plotly as py
+import plotly.offline as py
 import plotly.tools as tls
 import plotly.graph_objs as go
+
+from flask_caching import Cache
 
 
 # From SO: https://stackoverflow.com/a/29172195/8088718
 # Avoid the tk gui bug
-# import matplotlib
-# matplotlib.use("Agg")
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt, mpld3
 
 # Set logging level
@@ -33,6 +37,13 @@ mpl_log.setLevel(logging.WARNING)
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
+
+CACHE_CONFIG = {
+    "CACHE_TYPE": "redis",
+    "CACHE_REDIS_URL": os.environ.get("REDIS_URL", "redis://localhost:6379"),
+}
+cache = Cache()
+cache.init_app(app.server, config=CACHE_CONFIG)
 
 # grain_param = 10
 # poly_order_param = 5
@@ -71,32 +82,69 @@ def plot_atd(my_data_file, my_grain, my_poly_order, my_smoothes, my_window_len):
     # Plot the ATD
     ms = MassSpectrum()
     ms.read_text_file(my_data_file, 0, my_grain, normalisationtype="bpi")
+    
     ms.smoothingSG(my_window_len, my_smoothes, my_poly_order)
     ms.normalisation_bpi()
     # ms.select_ms_range(4200,9000)
 
     # fig = plt.figure(figsize=(12, 8)
     # ax = plt.subplot(311)
-    fig, ax = plt.subplots()
-    ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
-    logging.debug(ms.__dict__)
-    return fig, ms
+    # fig, ax = plt.subplots()
+    # ms.plot_simulated_spectrum_simple(ax, color=tableau20[2])
+    # logging.debug(ms.__dict__)
+    fig = go.Figure()
+    fig.add_trace(go.Scattergl(
+        x = ms.xvals,
+        y = ms.yvals,
+        mode='lines',
+    ))
+    
+    return fig
 
 
-@do_cprofile
+# @do_cprofile
 def plot_pp_csd(my_simul_peak, msobj):
-    pp = PeakPicking()
-    pp.calculate_gradient(msobj.xvals, msobj.yvals)
-    found_peaks = pp.find_peaks(1)
+    # pp = PeakPicking()
+    # pp.calculate_gradient(msobj.xvals, msobj.yvals)
+    # found_peaks = pp.find_peaks(1)
 
-    # fig = plt.figure(figsize=(12, 8))
-    # ax2 = plt.subplot(312)
-    fig, ax2 = plt.subplots()
-    msobj.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
-    for peak in found_peaks:
-        peak.plotSimulatedPeak(ax2, msobj.xvals, fwhm=my_simul_peak, color=tableau20[5])
+    # # fig = plt.figure(figsize=(12, 8))
+    # # ax2 = plt.subplot(312)
+    # fig, ax2 = plt.subplots()
+    # msobj.plot_simulated_spectrum_simple(ax2, color=tableau20[6])
+    # for peak in found_peaks:
+    #     peak.plotSimulatedPeak(ax2, msobj.xvals, fwhm=my_simul_peak, color=tableau20[5])
 
     # plt.show()
+    from scipy.signal import find_peaks
+    from scipy.signal import argrelmax, argrelmin
+    import pprint
+    import numpy as np
+    import pandas as pd
+    import peakutils
+
+    indices, top = find_peaks(ms.yvals, prominence=1)
+    pprint.pprint(top)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scattergl(
+        y = ms.yvals,
+        mode = 'lines',
+        name = 'ATD+Peaks'
+    ))
+
+    fig.add_trace(go.Scattergl(
+        x = indices,
+        y = [ms.yvals[j] for j in indices],
+        mode = 'markers',
+        marker = dict(
+            size = 8,
+            color = 'red',
+            symbol = 'cross'
+        ),
+        name = 'CCS Peaks'
+    ))
+
     return fig
 
     # fig = plt.figure() # figsize=(12, 8))
@@ -268,8 +316,8 @@ def update_adt_graph(
             windowlen_value,
         )
     return (
-        go.Figure(tls.mpl_to_plotly(atd)),
-        go.Figure(tls.mpl_to_plotly(plot_pp_csd(simulpeak_value, msobj))),
+        go.Figure(atd),
+        go.Figure(plot_pp_csd(simulpeak_value, msobj)),
     )
 
 
@@ -364,4 +412,7 @@ def update_adt_graph(
 #     # plt.plot()
 
 if __name__ == "__main__":
+    # from werkzeug.contrib.profiler import ProfilerMiddleware
+    # app.server.config['PROFILE'] = True
+    # app.server.wsgi_app = ProfilerMiddleware(app.server.wsgi_app, restrictions=[30])
     app.run_server(debug=False, host="127.0.0.1", port=5000, threaded=True)
