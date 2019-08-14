@@ -12,7 +12,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
-import plotly.plotly as py
+import chart_studio.plotly as py
 import plotly.tools as tls
 import plotly.graph_objs as go
 import json
