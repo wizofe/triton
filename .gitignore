@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# lock files
+*.lock
+
 pyan/
 
 # Distribution / packaging
@@ -91,6 +94,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+ienv/
 
 # Spyder project settings
 .spyderproject
