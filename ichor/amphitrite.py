@@ -23,7 +23,7 @@ import json
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt, mpld3
+# import matplotlib.pyplot as plt, mpld3
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 
