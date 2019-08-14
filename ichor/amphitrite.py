@@ -16,7 +16,8 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
-import plotly.offline as py
+
+import chart_studio.plotly as py
 import plotly.tools as tls
 import plotly.graph_objs as go
 
@@ -33,7 +34,7 @@ from flask_caching import Cache
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt, mpld3
+# import matplotlib.pyplot as plt, mpld3
 
 # Set logging level
 logging.basicConfig(filename="tritonDebug.log", level=logging.DEBUG)
