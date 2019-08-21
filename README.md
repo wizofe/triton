@@ -10,7 +10,7 @@ The original Amphitrite code-base was ported from Python 2.x to Python 3.x using
 
 IPC Client Server Architecture with a Renderer/Main process and a Flask server to server the front-end.
 
-[DIAGRAM HERE]
+![ARCHITECTURE](diagram.png)
 
 ## Installation
 
