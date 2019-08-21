@@ -14,13 +14,7 @@ IPC Client Server Architecture with a Renderer/Main process and a Flask server t
 
 ## Installation
 
-This software is using the `poetry` package manager in order to install the software. If you prefer the manual way then it's recommended to install a local, Python 3 `virtualenv` with the following packages:
-
-``` 
--
--
--
-```
+This software is using the `poetry` package manager in order to install the software. That means you only need to install the package and run `poetry install` which will install all the required modules as well as it will create a new environment for the user.
 
 Redis is used for local caching of expensive calculations, in order to free-up the front-end from it. Again developing for Windows is trickier than Unix platforms (Linux, OsX). One needs to install WSL and run:
 
@@ -42,9 +36,10 @@ For Windows you can install waitress and run `waitress-serve.exe --listen=*:5000
 
 ## How to run
 
-Start the virtual environment that you created previously and run `python3 ichor/amphitrite.py` in order to create a server process that will provide a local server on a predefined port (5000 by default but that can be changed). 
+Start the virtual environment that you created previously and run `cd ichor ; python3 triton.py` in order to create a server process that will provide a local server on a predefined port (5000 by default but that can be changed). 
 
 When this is sucesfull the Electron part of the application can be started by running `electron .` which will install the respective `node_modules` and run the front-end.
 
 _Note_: You need to save the data files inside `ichor/data` folder for the front-end to properly operate. This is going to be changed in future versions.
 
+Alternatively a WSGI client can be used such as `waitress-serve` for Windows in the production.
