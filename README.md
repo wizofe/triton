@@ -46,7 +46,7 @@ Alternatively a WSGI client can be used such as `waitress-serve` for Windows in 
 
 # Copyright
 
-If you use this software or any part of it please add a citation to the following DOI
+If you use this software or any part of it please create a citation using the following DOI
 [![DOI](https://zenodo.org/badge/180900436.svg)](https://zenodo.org/badge/latestdoi/180900436)
 
 Thank you :) 
