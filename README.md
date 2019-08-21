@@ -43,3 +43,10 @@ When this is sucesfull the Electron part of the application can be started by ru
 _Note_: You need to save the data files inside `ichor/data` folder for the front-end to properly operate. This is going to be changed in future versions.
 
 Alternatively a WSGI client can be used such as `waitress-serve` for Windows in the production.
+
+# Copyright
+
+If you use this software or any part of it please add a citation to the following DOI
+[![DOI](https://zenodo.org/badge/180900436.svg)](https://zenodo.org/badge/latestdoi/180900436)
+
+Thank you :) 
